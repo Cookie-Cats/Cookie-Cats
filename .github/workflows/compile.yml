@@ -1,0 +1,25 @@
+name: Compile Sketch
+
+on:
+  - push
+  - pull_request
+  - workflow_dispatch
+
+jobs:
+  compile-sketch:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Compile sketch
+        uses: arduino/compile-sketches@v1
+        with:
+          fqbn: esp8266:esp8266:nodemcu
+          platforms: |
+            - name: esp8266:esp8266
+              source-url: https://arduino.esp8266.com/stable/package_esp8266com_index.json
+              version: 3.1.2
+          sketch-paths: |
+            - ./Cookie-Cats/
