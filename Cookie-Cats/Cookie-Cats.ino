@@ -61,12 +61,6 @@ void setup() {
     httpserver.send(302, "text/plain", "");
   });
 
-  httpserver.on("/index.html", HTTP_GET, []() {
-    File file = LittleFS.open("/web/index.html", "r");
-    httpserver.streamFile(file, "text/plain");
-    file.close();
-  });
-
   // 网络状态
   // API。通过访问 "/status/network" 得到
   httpserver.on("/status/network", HTTP_GET, []() {
@@ -84,9 +78,23 @@ void setup() {
     httpserver.send(200, "text/plain", meow("http://192.168.10.151:8080", wifiClient));
   });
 
-  // 404
+  // 处理页面请求
   httpserver.onNotFound([]() {
-    httpserver.send(404, "text/plain", "404 Not found.");
+    // 获取用户请求网址信息
+    String webAddress = httpserver.uri();
+
+    bool fileReadOK = false;
+    String localAddress = "/web/" + webAddress + ".gz";  // 默认文件以 gz 压缩
+
+    if (LittleFS.exists(localAddress)) {             // 如果访问的文件可以在LittleFS中找到
+      File file = LittleFS.open(localAddress, "r");  // 则尝试打开该文件
+      httpserver.streamFile(file, getContentType(webAddress));
+      file.close();
+    }
+
+    if (!fileReadOK) {
+      httpserver.send(404, "text/plain", "404 Not found.");
+    }
   });
 
   httpserver.begin();
@@ -96,4 +104,21 @@ void setup() {
 
 void loop(void) {
   httpserver.handleClient();  // 处理客户端请求
+}
+
+// 获取文件类型
+String getContentType(String filename) {
+  if (filename.endsWith(".htm")) return "text/html";
+  else if (filename.endsWith(".html")) return "text/html";
+  else if (filename.endsWith(".css")) return "text/css";
+  else if (filename.endsWith(".js")) return "application/javascript";
+  else if (filename.endsWith(".png")) return "image/png";
+  else if (filename.endsWith(".gif")) return "image/gif";
+  else if (filename.endsWith(".jpg")) return "image/jpeg";
+  else if (filename.endsWith(".ico")) return "image/x-icon";
+  else if (filename.endsWith(".xml")) return "text/xml";
+  else if (filename.endsWith(".pdf")) return "application/x-pdf";
+  else if (filename.endsWith(".zip")) return "application/x-zip";
+  else if (filename.endsWith(".gz")) return "application/gzip";
+  return "text/plain";
 }

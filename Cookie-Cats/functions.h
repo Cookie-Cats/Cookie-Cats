@@ -17,4 +17,4 @@ bool testNet(WiFiClient wifiClient);
 // 详见：https://github.com/Cookie-Cats/meow
 String meow(String meow_url, WiFiClient wifiClient);
 
-#endif // FUNCTIONS_H
+#endif  // FUNCTIONS_H
