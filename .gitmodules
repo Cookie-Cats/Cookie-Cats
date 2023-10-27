@@ -1,0 +1,4 @@
+[submodule "Cookie-Cats/data/web-controller"]
+	path = Cookie-Cats/data/web-controller
+	url = https://github.com/Cookie-Cats/web-controller.git
+    branch = compressed

@@ -84,7 +84,7 @@ void setup() {
     String webAddress = httpserver.uri();
 
     bool fileReadOK = false;
-    String localAddress = "/web/" + webAddress + ".gz";  // 默认文件以 gz 压缩
+    String localAddress = "/web-controller/compressed/" + webAddress + ".gz";  // 默认文件以 gz 压缩
 
     if (LittleFS.exists(localAddress)) {             // 如果访问的文件可以在LittleFS中找到
       File file = LittleFS.open(localAddress, "r");  // 则尝试打开该文件
