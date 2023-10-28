@@ -31,6 +31,9 @@ jobs:
               version: 3.1.2
           sketch-paths: |
             - ./Cookie-Cats/
+          libraries: |
+            - name: ArduinoJson
+              version: 6.21.3
           enable-deltas-report: true
           sketches-report-path: ${{ env.SKETCHES_REPORTS_PATH }}
 

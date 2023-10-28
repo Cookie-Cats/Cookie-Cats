@@ -4,46 +4,20 @@
 #include <ESP8266WebServer.h>
 #include <ESP8266HTTPClient.h>
 #include "functions.h"
+#include "structures.h"
 
 using namespace std;
-
-#define WIFI_SSID "OpenWrt"
-#define WIFI_PASS "okgogogo"
-
-#define AP_SSID "ESP"
-#define AP_PASS "okgogogo"
 
 WiFiClient wifiClient;
 
 // 在 80 端口实例化 http 服务器
 ESP8266WebServer httpserver(80);
 
+Configuration configuration;  // 实例化配置项
+
 void setup() {
   // 开启串口
   Serial.begin(9600);
-  Serial.println();
-
-  // 开启接入点，连接 WiFi
-  WiFi.mode(WIFI_AP_STA);
-  WiFi.softAP(AP_SSID, AP_PASS);
-  WiFi.begin(WIFI_SSID, WIFI_PASS);
-
-  Serial.print("Connecting to ");
-  Serial.print(WIFI_SSID);
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(100);
-    Serial.print(".");
-  }
-
-  Serial.println("\nConnected!");
-  Serial.print("IP address for network ");
-  Serial.print(WIFI_SSID);
-  Serial.print(" : ");
-  Serial.println(WiFi.localIP());
-  Serial.print("IP address for network ");
-  Serial.print(AP_SSID);
-  Serial.print(" : ");
-  Serial.print(WiFi.softAPIP());
   Serial.println();
 
   // 启动闪存文件系统
@@ -51,6 +25,47 @@ void setup() {
     Serial.println("LittleFS Started.\n");
   } else {
     Serial.println("LittleFS Failed to Start.\n");
+  }
+
+  // 载入自定义配置
+  Serial.println("Loading config.json...");
+  if (LittleFS.exists("/config.json")) {             // 如果 config.json 可以在LittleFS中找到
+    File file = LittleFS.open("/config.json", "r");  // 则尝试打开该文件
+    configuration = readConfigurationFromFile(file, configuration);
+    file.close();  // 关闭文件
+  } else {
+    Serial.println("No config.json found, use default settings.");
+  }
+
+  // 设置 WiFi
+  WiFi.mode(WIFI_AP_STA);
+
+  WiFi.softAP(configuration.Cookie_Cat_SSID, configuration.Cookie_Cat_PASSWORD);  // 设置 WiFi 接入点
+  Serial.print("WiFi access point SSID: ");
+  Serial.print(configuration.Cookie_Cat_SSID);
+  Serial.println();
+  Serial.print("WiFi access point Password: ");
+  Serial.print(configuration.Cookie_Cat_PASSWORD);
+  Serial.println();
+  Serial.print("Cookie-Cat is on:");
+  Serial.print(WiFi.softAPIP());
+  Serial.println();
+
+  if (configuration.WiFi_SSID != "") {  // 连接 WiFi
+    WiFi.begin(configuration.WiFi_SSID, configuration.WiFi_PASSWORD);
+    Serial.print("Connecting to ");
+    Serial.print(configuration.WiFi_SSID);
+    while (WiFi.status() != WL_CONNECTED) {
+      delay(100);
+      Serial.print(".");
+    }
+    Serial.println("\nConnected!");
+    Serial.print("IP address for network ");
+    Serial.print(configuration.WiFi_SSID);
+    Serial.print(" : ");
+    Serial.println(WiFi.localIP());
+  } else {
+    Serial.println("No WiFi access point configuration found. Skip.");
   }
 
   // 启动网络服务器
@@ -73,9 +88,17 @@ void setup() {
 
   // 获取IP
   // API，通过访问 "/status/ip" 得到
-  // TODO：目前仅支持meow，之后将增加其他方法
+  // TODO：目前仅支持 meow 和 manual，之后将增加其他方法
   httpserver.on("/status/ip", HTTP_GET, []() {
-    httpserver.send(200, "text/plain", meow("http://192.168.10.151:8080", wifiClient));
+    String ip;
+    if (configuration.IP_Obtain_Method.first == "meow") {
+      ip = meow(configuration.IP_Obtain_Method.second, wifiClient);
+    } else if (configuration.IP_Obtain_Method.first == "manual") {
+      ip = configuration.IP_Obtain_Method.second;
+    } else {
+      ip = "No IP method to found, please config IP method in config.json";
+    }
+    httpserver.send(200, "text/plain", ip);
   });
 
   // 处理页面请求
@@ -88,7 +111,7 @@ void setup() {
 
     if (LittleFS.exists(localAddress)) {             // 如果访问的文件可以在LittleFS中找到
       File file = LittleFS.open(localAddress, "r");  // 则尝试打开该文件
-      httpserver.streamFile(file, getContentType(webAddress));
+      httpserver.streamFile(file, httpGetContentType(webAddress));
       file.close();
     }
 
@@ -104,21 +127,4 @@ void setup() {
 
 void loop(void) {
   httpserver.handleClient();  // 处理客户端请求
-}
-
-// 获取文件类型
-String getContentType(String filename) {
-  if (filename.endsWith(".htm")) return "text/html";
-  else if (filename.endsWith(".html")) return "text/html";
-  else if (filename.endsWith(".css")) return "text/css";
-  else if (filename.endsWith(".js")) return "application/javascript";
-  else if (filename.endsWith(".png")) return "image/png";
-  else if (filename.endsWith(".gif")) return "image/gif";
-  else if (filename.endsWith(".jpg")) return "image/jpeg";
-  else if (filename.endsWith(".ico")) return "image/x-icon";
-  else if (filename.endsWith(".xml")) return "text/xml";
-  else if (filename.endsWith(".pdf")) return "application/x-pdf";
-  else if (filename.endsWith(".zip")) return "application/x-zip";
-  else if (filename.endsWith(".gz")) return "application/gzip";
-  return "text/plain";
 }

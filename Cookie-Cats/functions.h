@@ -1,7 +1,9 @@
 #include <Arduino.h>
 #include <WiFiClient.h>
-#include <vector>
 #include <ESP8266HTTPClient.h>
+#include <vector>
+#include <FS.h>
+#include "structures.h"
 
 #ifndef FUNCTIONS_H
 #define FUNCTIONS_H
@@ -16,5 +18,11 @@ bool testNet(WiFiClient wifiClient);
 // 方法1：meow
 // 详见：https://github.com/Cookie-Cats/meow
 String meow(String meow_url, WiFiClient wifiClient);
+
+// 用于 http 服务器，获取文件类型
+String httpGetContentType(String filename);
+
+// 读取配置文件
+Configuration readConfigurationFromFile(File file, Configuration configuration);
 
 #endif  // FUNCTIONS_H
