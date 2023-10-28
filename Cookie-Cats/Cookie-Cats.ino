@@ -55,6 +55,7 @@ void setup() {
     WiFi.begin(configuration.WiFi_SSID, configuration.WiFi_PASSWORD);
     Serial.print("Connecting to ");
     Serial.print(configuration.WiFi_SSID);
+    Serial.println();
     while (WiFi.status() != WL_CONNECTED) {
       delay(100);
       Serial.print(".");
@@ -99,6 +100,24 @@ void setup() {
       ip = "No IP method to found, please config IP method in config.json";
     }
     httpserver.send(200, "text/plain", ip);
+  });
+
+  // 重启
+  // API，访问 "/device/restart" 将立即重启
+  httpserver.on("/device/restart", HTTP_GET, []() {
+    httpserver.send(200, "text/plain", "Restart now.");
+    ESP.restart();
+  });
+
+  // 获取 config.json 内容
+  // API，访问 "/config/get"，将以 JSON 格式返回 config.json
+  httpserver.on("/config/get", HTTP_GET, []() {
+    if (LittleFS.exists("/config.json")) {
+      File jsonText = LittleFS.open("/config.json", "r");
+      httpserver.send(200, "application/json", jsonText);
+    } else {
+      httpserver.send(500, "application/json", "{\"error\":\"No config.json Found.\"}");
+    }
   });
 
   // 处理页面请求
