@@ -1,13 +1,6 @@
 #ifndef STRUCTURES_H
 #define STRUCTURES_H
 
-enum class Carrier {
-  ChinaTelecom,  // 中国电信
-  ChinaUnicom,   // 中国联通
-  ChinaMobile,   // 中国移动
-  None           // 空值
-};
-
 class Configuration {
 public:
   // 自身 WiFi
@@ -19,8 +12,14 @@ public:
   // 认证
   String username;
   String password;
-  Carrier carrier;  // 运营商
-  // IP 获取方式，目前只能是 meow、manual
+  // 运营商
+  // 只能为 ChinaTelecom, ChinaUnicom, ChinaMobile 其一
+  String carrier;  // 运营商
+  // 学校
+  // 目前支持的选项：ChinaPharmaceuticalUniversity
+  String school;
+  // IP 获取方式
+  // 目前支持的选项 meow、manual
   std::pair<String, String> IP_Obtain_Method;
 };
 

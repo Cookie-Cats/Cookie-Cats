@@ -223,25 +223,32 @@ Configuration readConfigurationFromFile(File file, Configuration configuration) 
 
   // 运营商
   if (config.containsKey("carrier")) {
-    const char* value = (const char*)config["carrier"];
-    if (strcmp(value, "ChinaTelecom") == 0) {
-      configuration.carrier = Carrier::ChinaTelecom;
-    } else if (strcmp(value, "ChinaUnicom") == 0) {
-      configuration.carrier = Carrier::ChinaUnicom;
-    } else if (strcmp(value, "ChinaMobile") == 0) {
-      configuration.carrier = Carrier::ChinaMobile;
-    } else {
-      configuration.carrier = Carrier::None;
-    }
-    if (configuration.carrier == Carrier::None) {
-      Serial.println("No set carrier or wrong set. Carrier could only in ChinaTelecom, ChinaUnicom, ChinaMobile.");
-    } else {
-      Serial.print("Set carrier into: ");
-      Serial.print(value);
-      Serial.println();
+    vector<String> Carriers = { "ChinaTelecom", "ChinaUnicom", "ChinaMobile" };
+    const char* carrier = (const char*)config["carrier"];
+
+    auto it = find(Carriers.begin(), Carriers.end(), carrier);  // 遍历运营商列表
+    if (it != Carriers.end()) {                                 // 如果找到了元素
+      configuration.carrier = carrier;
+    } else {  // 如果没有找到元素
+      Serial.println("Carrier not set or wrong set. Carrier could only be one of ChinaTelecom, ChinaUnicom, ChinaMobile.");
     }
   } else {
     Serial.println("No carrier found in config.json");
+  }
+
+  // 学校
+  if (config.containsKey("school")) {
+    vector<String> Schools = { "ChinaPharmaceuticalUniversity" };
+    const char* school = (const char*)config["school"];
+
+    auto it = find(Schools.begin(), Schools.end(), school);  // 遍历支持的学校列表
+    if (it != Schools.end()) {                               // 如果找到了元素
+      configuration.school = school;
+    } else {  // 如果没有找到元素
+      Serial.println("School not set or unsupported.");
+    }
+  } else {
+    Serial.println("No school found in config.json");
   }
 
   // IP 获取方式
@@ -250,7 +257,7 @@ Configuration readConfigurationFromFile(File file, Configuration configuration) 
     if (IP_Obtain_Method.containsKey("meow")) {  // 采用 meow
       const char* url = (const char*)IP_Obtain_Method["meow"];
       configuration.IP_Obtain_Method = { "meow", url };
-      Serial.print("Get meow URL: ");
+      Serial.print("Set meow URL: ");
       Serial.print(url);
       Serial.println();
     } else if (IP_Obtain_Method.containsKey("manual")) {  // 采用 manual
