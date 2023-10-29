@@ -266,9 +266,12 @@ Configuration readConfigurationFromFile(File file, Configuration configuration) 
       Serial.print("Get manual input IP: ");
       Serial.print(ip);
       Serial.println();
+    } else if (IP_Obtain_Method.containsKey("unnecessary")) {  // 采用 unnecessary
+      configuration.IP_Obtain_Method = { "unnecessary", "0.0.0.0" };
+      Serial.println("Set IP_Obtain_Method into unnecessary.");
     }
   } else {
-    Serial.println("No IP_Obtain_Method found in config.json");
+    Serial.println("IP_Obtain_Method not set or wrong set. IP_Obtain_Method could only be one of meow, manual, unnecessary.");
   }
   Serial.println("Read config.json completed.");
   return configuration;

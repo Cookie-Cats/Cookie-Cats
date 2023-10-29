@@ -3,6 +3,7 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
 #include <ESP8266HTTPClient.h>
+#include <ArduinoJson.h>
 #include "functions.h"
 #include "structures.h"
 
@@ -117,6 +118,45 @@ void setup() {
       httpserver.send(200, "application/json", jsonText);
     } else {
       httpserver.send(500, "application/json", "{\"error\":\"No config.json Found.\"}");
+    }
+  });
+
+  // 保存 config.json 内容
+  // API，访问 "/config/save"，将接收客户端 post 的 JSON 数据，并使用 ArduinoJson 读取
+  // 如果 JSON 格式合法，将把接收到的 JSON 覆盖保存到 config.json
+  // 如果保存成功，返回状态码为 200，类型：application/json 内容：{"success":"config.json saved."}
+  // 如果保存失败，则返回状态码 500，类型：application/json 内容：{"error":"Failed to save."}
+  // 测试命令：curl -X POST -H "Content-Type: application/json" -d '{"Cookie_Cat_SSID": "CookieCat","Cookie_Cat_PASSWORD": "cookiecat","WiFi_SSID": "OpenWrt","WiFi_PASSWORD": "okgogogo","username": "","password": "","carrier": "","school": "","IP_Obtain_Method": {"meow": "http://192.168.10.151:8080"}}' http://192.168.10.181/config/save 
+  httpserver.on("/config/save", HTTP_POST, []{
+    Serial.println("Receiving config.json...");
+    // 创建一个 JSON 文档对象，用于存储接收到的 JSON 数据
+    DynamicJsonDocument doc(1024);
+    // 尝试从客户端读取 JSON 数据，并解析到文档对象中
+    DeserializationError error = deserializeJson(doc, httpserver.arg("plain"));
+    // 如果解析成功，说明 JSON 格式合法
+    if (!error) {
+      // 尝试打开 config.json 文件，如果不存在则创建一个新文件
+      File jsonConfig = LittleFS.open("/config.json", "w");
+      // 如果文件打开成功，说明可以写入数据
+      if (jsonConfig) {
+        // 将文档对象中的 JSON 数据序列化到文件中
+        serializeJson(doc, jsonConfig);
+        // 关闭文件
+        jsonConfig.close();
+        // 返回成功信息
+        Serial.println("config.json saved.");
+        httpserver.send(200, "application/json", "{\"success\":\"config.json saved.\"}");
+      } else {
+        // 如果文件打开失败，说明无法写入数据
+        // 返回失败信息
+        Serial.println("Failed to save config.json");
+        httpserver.send(500, "application/json", "{\"error\":\"Failed to save.\"}");
+      }
+    } else {
+      // 如果解析失败，说明 JSON 格式不合法
+      // 返回失败信息
+      Serial.println("Invalid JSON format.");
+      httpserver.send(500, "application/json", "{\"error\":\"Invalid JSON format.\"}");
     }
   });
 

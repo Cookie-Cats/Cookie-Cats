@@ -19,7 +19,10 @@ public:
   // 目前支持的选项：ChinaPharmaceuticalUniversity
   String school;
   // IP 获取方式
-  // 目前支持的选项 meow、manual
+  // 目前支持的选项：
+  // meow: url
+  // manual: ip
+  // unnecessary 无value，指定为 0.0.0.0
   std::pair<String, String> IP_Obtain_Method;
 };
 
