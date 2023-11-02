@@ -16,7 +16,7 @@ String randomUA() {
 
 // 检测网络通断
 bool testNet(WiFiClient wifiClient) {
-  Serial.println("Start testing the Internet");
+  Serial.println(F("Start testing the Internet"));
   static const vector<String> testServer = {
     "http://connect.rom.miui.com/generate_204",                    // 小米
     "http://connectivitycheck.platform.hicloud.com/generate_204",  // 华为
@@ -31,22 +31,22 @@ bool testNet(WiFiClient wifiClient) {
 
     String URL = testServer[random(0, testServer.size() - 1)];
     httpClient.begin(wifiClient, URL);
-    Serial.print("Use ");
+    Serial.print(F("Use "));
     Serial.print(URL);
-    Serial.print(" to test.\n");
+    Serial.print(F(" to test.\n"));
 
     String UA = randomUA();
     httpClient.setUserAgent(UA);
-    Serial.print("User-Agent: ");
+    Serial.print(F("User-Agent: "));
     Serial.print(UA);
     Serial.println();
 
     httpClient.setTimeout(5000);  // 超时 5 秒
 
-    Serial.println("Sending get");
+    Serial.println(F("Sending get"));
     int responseCode = httpClient.GET();  // 发送请求
 
-    Serial.println("Stop httpclient");
+    Serial.println(F("Stop httpclient"));
     httpClient.end();  // 关闭连接
 
     if (responseCode == HTTP_CODE_NO_CONTENT) {  // 返回 204，连接成功
@@ -55,9 +55,9 @@ bool testNet(WiFiClient wifiClient) {
     }
   }
   if (connected) {
-    Serial.print("Test Internet connection successfully.\n");
+    Serial.println(F("Test Internet connection successfully."));
   } else {
-    Serial.print("No connection to the Internet.\n");
+    Serial.println(F("No connection to the Internet."));
   }
   return connected;
 }
@@ -74,11 +74,11 @@ String meow(String meow_url, WiFiClient wifiClient) {
     HTTPClient httpClient;
 
     httpClient.begin(wifiClient, meow_url);
-    Serial.print("Use ");
+    Serial.print(F("Use "));
     Serial.print(meow_url);
-    Serial.print(" to get IP.\n");
+    Serial.print(F(" to get IP.\n"));
 
-    Serial.println("Send get.");
+    Serial.println(F("Send get."));
     int responseCode = httpClient.GET();  // 发送请求
 
     if (responseCode == HTTP_CODE_OK) {  // 返回 200，连接成功
@@ -87,13 +87,13 @@ String meow(String meow_url, WiFiClient wifiClient) {
       break;
     }
 
-    Serial.println("Stop httpclient.\n");
+    Serial.println(F("Stop httpclient.\n"));
     httpClient.end();  // 关闭连接
   }
   if (responsePayload == "0.0.0.0") {  // 如果返回 "0.0.0.0"，则认为获取失败。meow 也是这样定义的。
-    Serial.println("Can't connect to meow server.");
+    Serial.println(F("Can't connect to meow server."));
   } else {
-    Serial.print("Get IP: ");
+    Serial.print(F("Get IP: "));
     Serial.print(responsePayload);
     Serial.println();
   }
@@ -119,11 +119,11 @@ String httpGetContentType(String filename) {
 
 // 读取配置文件
 Configuration readConfigurationFromFile(File file, Configuration configuration) {
-  Serial.println("Found config.json, reading...");
+  Serial.println(F("Found config.json, reading..."));
   DynamicJsonDocument config(1024);                            // 分配一个 JSON 文档对象
   DeserializationError error = deserializeJson(config, file);  // 解析文件内容为 JSON 对象
   if (error) {
-    Serial.println("Parsing config.json fails, using the default configuration.");
+    Serial.println(F("Parsing config.json fails, using the default configuration."));
   }
 
   // 读取内容并写配置
@@ -136,14 +136,14 @@ Configuration readConfigurationFromFile(File file, Configuration configuration) 
     // 判断值是否为空，如果不为空，则赋给String类型的变量
     if (value && strlen(value) > 0) {
       configuration.Cookie_Cat_SSID = value;
-      Serial.print("Set Cookie_Cat_SSID into: ");
+      Serial.print(F("Set Cookie_Cat_SSID into: "));
       Serial.print(configuration.Cookie_Cat_SSID);
       Serial.println();
     } else {
-      Serial.println("Cookie_Cat_SSID not set.");
+      Serial.println(F("Cookie_Cat_SSID not set."));
     }
   } else {
-    Serial.println("No Cookie_Cat_SSID found in config.json, use CookieCat instead.");
+    Serial.println(F("No Cookie_Cat_SSID found in config.json, use CookieCat instead."));
   }
 
   // 自身 WiFi 密码
@@ -151,29 +151,27 @@ Configuration readConfigurationFromFile(File file, Configuration configuration) 
     const char* value = (const char*)config["Cookie_Cat_PASSWORD"];
     if (value && strlen(value) > 0) {
       configuration.Cookie_Cat_PASSWORD = value;
-      Serial.print("Set Cookie_Cat_PASSWORD into: ");
+      Serial.print(F("Set Cookie_Cat_PASSWORD into: "));
       Serial.print(configuration.Cookie_Cat_PASSWORD);
       Serial.println();
     } else {
-      Serial.println("Cookie_Cat_PASSWORD not set.");
+      configuration.Cookie_Cat_PASSWORD = "cookiecat";
+      Serial.println(F("Cookie_Cat_PASSWORD not set or NULL. Empty password is not allowed. Use cookiecat as default."));
     }
   } else {
-    Serial.println("No Cookie_Cat_PASSWORD found in config.json, use okgogogo instead.");
+    configuration.Cookie_Cat_PASSWORD = "cookiecat";
+    Serial.println(F("No Cookie_Cat_PASSWORD found in config.json, Use cookiecat as default."));
   }
 
   // 连接 WiFi SSID
   if (config.containsKey("WiFi_SSID")) {
     const char* value = (const char*)config["WiFi_SSID"];
-    if (value && strlen(value) > 0) {
-      configuration.WiFi_SSID = value;
-      Serial.print("Set WiFi_SSID into: ");
-      Serial.print(configuration.WiFi_SSID);
-      Serial.println();
-    } else {
-      Serial.println("WiFi_SSID not set.");
-    }
+    configuration.WiFi_SSID = value;
+    Serial.print(F("Set WiFi_SSID into: "));
+    Serial.print(configuration.WiFi_SSID);
+    Serial.println();
   } else {
-    Serial.println("No WiFi_SSID found in config.json");
+    Serial.println(F("No WiFi_SSID found in config.json"));
   }
 
   // 连接 WiFi 密码
@@ -181,14 +179,14 @@ Configuration readConfigurationFromFile(File file, Configuration configuration) 
     const char* value = (const char*)config["WiFi_PASSWORD"];
     if (value && strlen(value) > 0) {
       configuration.WiFi_PASSWORD = value;
-      Serial.print("Set WiFi_PASSWORD into: ");
+      Serial.print(F("Set WiFi_PASSWORD into: "));
       Serial.print(configuration.WiFi_PASSWORD);
       Serial.println();
     } else {
-      Serial.println("WiFi_PASSWORD not set.");
+      Serial.println(F("WiFi_PASSWORD not set."));
     }
   } else {
-    Serial.println("No WiFi_PASSWORD found in config.json");
+    Serial.println(F("No WiFi_PASSWORD found in config.json"));
   }
 
   // 认证用户名
@@ -196,14 +194,14 @@ Configuration readConfigurationFromFile(File file, Configuration configuration) 
     const char* value = (const char*)config["username"];
     if (value && strlen(value) > 0) {
       configuration.username = value;
-      Serial.print("Set username into: ");
+      Serial.print(F("Set username into: "));
       Serial.print(configuration.username);
       Serial.println();
     } else {
-      Serial.println("username not set.");
+      Serial.println(F("username not set."));
     }
   } else {
-    Serial.println("No username found in config.json");
+    Serial.println(F("No username found in config.json"));
   }
 
   // 认证密码
@@ -211,14 +209,15 @@ Configuration readConfigurationFromFile(File file, Configuration configuration) 
     const char* value = (const char*)config["password"];
     if (value && strlen(value) > 0) {
       configuration.password = value;
-      Serial.print("Set password into: ");
+      Serial.print(F("Set password into: "));
       Serial.print(configuration.password);
       Serial.println();
     } else {
-      Serial.println("password not set.");
+      configuration.password = value;
+      Serial.println(F("password not set or NULL."));
     }
   } else {
-    Serial.println("No password found in config.json");
+    Serial.println(F("No password found in config.json"));
   }
 
   // 运营商
@@ -230,10 +229,10 @@ Configuration readConfigurationFromFile(File file, Configuration configuration) 
     if (it != Carriers.end()) {                                 // 如果找到了元素
       configuration.carrier = carrier;
     } else {  // 如果没有找到元素
-      Serial.println("Carrier not set or wrong set. Carrier could only be one of ChinaTelecom, ChinaUnicom, ChinaMobile.");
+      Serial.println(F("Carrier not set or wrong set. Carrier could only be one of ChinaTelecom, ChinaUnicom, ChinaMobile."));
     }
   } else {
-    Serial.println("No carrier found in config.json");
+    Serial.println(F("No carrier found in config.json"));
   }
 
   // 学校
@@ -245,10 +244,10 @@ Configuration readConfigurationFromFile(File file, Configuration configuration) 
     if (it != Schools.end()) {                               // 如果找到了元素
       configuration.school = school;
     } else {  // 如果没有找到元素
-      Serial.println("School not set or unsupported.");
+      Serial.println(F("School not set or unsupported."));
     }
   } else {
-    Serial.println("No school found in config.json");
+    Serial.println(F("No school found in config.json"));
   }
 
   // IP 获取方式
@@ -257,22 +256,22 @@ Configuration readConfigurationFromFile(File file, Configuration configuration) 
     if (IP_Obtain_Method.containsKey("meow")) {  // 采用 meow
       const char* url = (const char*)IP_Obtain_Method["meow"];
       configuration.IP_Obtain_Method = { "meow", url };
-      Serial.print("Set meow URL: ");
+      Serial.print(F("Set meow URL: "));
       Serial.print(url);
       Serial.println();
     } else if (IP_Obtain_Method.containsKey("manual")) {  // 采用 manual
       const char* ip = (const char*)IP_Obtain_Method["manual"];
       configuration.IP_Obtain_Method = { "manual", ip };
-      Serial.print("Get manual input IP: ");
+      Serial.print(F("Get manual input IP: "));
       Serial.print(ip);
       Serial.println();
     } else if (IP_Obtain_Method.containsKey("unnecessary")) {  // 采用 unnecessary
       configuration.IP_Obtain_Method = { "unnecessary", "0.0.0.0" };
-      Serial.println("Set IP_Obtain_Method into unnecessary.");
+      Serial.println(F("Set IP_Obtain_Method into unnecessary."));
     }
   } else {
-    Serial.println("IP_Obtain_Method not set or wrong set. IP_Obtain_Method could only be one of meow, manual, unnecessary.");
+    Serial.println(F("IP_Obtain_Method not set or wrong set. IP_Obtain_Method could only be one of meow, manual, unnecessary."));
   }
-  Serial.println("Read config.json completed.");
+  Serial.println(F("Read config.json completed."));
   return configuration;
 }

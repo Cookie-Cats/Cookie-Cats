@@ -23,52 +23,66 @@ void setup() {
 
   // 启动闪存文件系统
   if (LittleFS.begin()) {
-    Serial.println("LittleFS Started.\n");
+    Serial.println(F("LittleFS Started."));
   } else {
-    Serial.println("LittleFS Failed to Start.\n");
+    Serial.println(F("LittleFS Failed to Start."));
   }
 
   // 载入自定义配置
-  Serial.println("Loading config.json...");
+  Serial.println(F("Loading config.json..."));
   if (LittleFS.exists("/config.json")) {             // 如果 config.json 可以在LittleFS中找到
     File file = LittleFS.open("/config.json", "r");  // 则尝试打开该文件
     configuration = readConfigurationFromFile(file, configuration);
     file.close();  // 关闭文件
   } else {
-    Serial.println("No config.json found, use default settings.");
+    Serial.println(F("No config.json found, use default settings."));
   }
 
   // 设置 WiFi
   WiFi.mode(WIFI_AP_STA);
 
   WiFi.softAP(configuration.Cookie_Cat_SSID, configuration.Cookie_Cat_PASSWORD);  // 设置 WiFi 接入点
-  Serial.print("WiFi access point SSID: ");
+  Serial.print(F("WiFi access point SSID: "));
   Serial.print(configuration.Cookie_Cat_SSID);
   Serial.println();
-  Serial.print("WiFi access point Password: ");
+  Serial.print(F("WiFi access point Password: "));
   Serial.print(configuration.Cookie_Cat_PASSWORD);
   Serial.println();
-  Serial.print("Cookie-Cat is on:");
+  Serial.print(F("Cookie-Cat is on:"));
   Serial.print(WiFi.softAPIP());
   Serial.println();
 
-  if (configuration.WiFi_SSID != "") {  // 连接 WiFi
+  // 连接 WiFi
+  if (configuration.WiFi_SSID != "") {
     WiFi.begin(configuration.WiFi_SSID, configuration.WiFi_PASSWORD);
-    Serial.print("Connecting to ");
+    Serial.print(F("Connecting to "));
     Serial.print(configuration.WiFi_SSID);
     Serial.println();
-    while (WiFi.status() != WL_CONNECTED) {
-      delay(100);
-      Serial.print(".");
+    delay(1000);  // 等待 WiFi 连接
+
+    for (int i = 0; i < 500; i++) {  // 连接 WiFi，最多尝试 500 次
+      if (WiFi.status() == WL_CONNECTED) {
+        Serial.println(F("Connected!"));
+        Serial.print(F("IP address for network "));
+        Serial.print(configuration.WiFi_SSID);
+        Serial.print(F(": "));
+        Serial.println(WiFi.localIP());
+        break;
+      } else {
+        Serial.print(F("."));
+        delay(100);
+      }
     }
-    Serial.println("\nConnected!");
-    Serial.print("IP address for network ");
-    Serial.print(configuration.WiFi_SSID);
-    Serial.print(" : ");
-    Serial.println(WiFi.localIP());
+    if (WiFi.status() != WL_CONNECTED) {
+      Serial.print(F("Cannot connect to "));
+      Serial.print(configuration.WiFi_SSID);
+      Serial.print(F(". Skip."));
+      Serial.println();
+    }
   } else {
-    Serial.println("No WiFi access point configuration found. Skip.");
+    Serial.println(F("No WiFi access point config found. Skip."));
   }
+
 
   // 启动网络服务器
 
@@ -126,9 +140,9 @@ void setup() {
   // 如果 JSON 格式合法，将把接收到的 JSON 覆盖保存到 config.json
   // 如果保存成功，返回状态码为 200，类型：application/json 内容：{"success":"config.json saved."}
   // 如果保存失败，则返回状态码 500，类型：application/json 内容：{"error":"Failed to save."}
-  // 测试命令：curl -X POST -H "Content-Type: application/json" -d '{"Cookie_Cat_SSID": "CookieCat","Cookie_Cat_PASSWORD": "cookiecat","WiFi_SSID": "OpenWrt","WiFi_PASSWORD": "okgogogo","username": "","password": "","carrier": "","school": "","IP_Obtain_Method": {"meow": "http://192.168.10.151:8080"}}' http://192.168.10.181/config/save 
-  httpserver.on("/config/save", HTTP_POST, []{
-    Serial.println("Receiving config.json...");
+  // 测试命令：curl -X POST -H "Content-Type: application/json" -d '{"Cookie_Cat_SSID": "CookieCat","Cookie_Cat_PASSWORD": "cookiecat","WiFi_SSID": "OpenWrt","WiFi_PASSWORD": "okgogogo","username": "","password": "","carrier": "","school": "","IP_Obtain_Method": {"meow": "http://192.168.10.151:8080"}}' http://192.168.10.181/config/save
+  httpserver.on("/config/save", HTTP_POST, [] {
+    Serial.println(F("Receiving config.json..."));
     // 创建一个 JSON 文档对象，用于存储接收到的 JSON 数据
     DynamicJsonDocument doc(1024);
     // 尝试从客户端读取 JSON 数据，并解析到文档对象中
@@ -144,18 +158,18 @@ void setup() {
         // 关闭文件
         jsonConfig.close();
         // 返回成功信息
-        Serial.println("config.json saved.");
+        Serial.println(F("config.json saved."));
         httpserver.send(200, "application/json", "{\"success\":\"config.json saved.\"}");
       } else {
         // 如果文件打开失败，说明无法写入数据
         // 返回失败信息
-        Serial.println("Failed to save config.json");
+        Serial.println(F("Failed to save config.json"));
         httpserver.send(500, "application/json", "{\"error\":\"Failed to save.\"}");
       }
     } else {
       // 如果解析失败，说明 JSON 格式不合法
       // 返回失败信息
-      Serial.println("Invalid JSON format.");
+      Serial.println(F("Invalid JSON format."));
       httpserver.send(500, "application/json", "{\"error\":\"Invalid JSON format.\"}");
     }
   });
@@ -181,7 +195,9 @@ void setup() {
 
   httpserver.begin();
 
-  Serial.println("HTTP server started on :80");
+  Serial.println(F("HTTP server started on :80"));
+
+  Serial.println(F("Cookie-Cats Initialized Successfully."));
 }
 
 void loop(void) {
