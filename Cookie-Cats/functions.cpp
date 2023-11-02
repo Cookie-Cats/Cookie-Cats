@@ -4,6 +4,7 @@
 
 using namespace std;
 
+
 // 获得随机 UA
 String randomUA() {
   static const vector<String> UAs = {
@@ -44,7 +45,9 @@ bool testNet(WiFiClient wifiClient) {
     httpClient.setTimeout(5000);  // 超时 5 秒
 
     Serial.println("Sending get");
+
     int responseCode = httpClient.GET();  // 发送请求
+    yield();                              // 让出 CPU 控制权
 
     Serial.println("Stop httpclient");
     httpClient.end();  // 关闭连接
@@ -65,7 +68,6 @@ bool testNet(WiFiClient wifiClient) {
 // 获取当前 IP
 // 方法1：meow
 // 详见：https://github.com/Cookie-Cats/meow
-
 String meow(String meow_url, WiFiClient wifiClient) {
   // 定义反馈结果
   String responsePayload = "0.0.0.0";
@@ -79,7 +81,9 @@ String meow(String meow_url, WiFiClient wifiClient) {
     Serial.print(" to get IP.\n");
 
     Serial.println("Send get.");
+
     int responseCode = httpClient.GET();  // 发送请求
+    yield();                              // 让出 CPU 控制权
 
     if (responseCode == HTTP_CODE_OK) {  // 返回 200，连接成功
       responsePayload = httpClient.getString();
@@ -155,10 +159,12 @@ Configuration readConfigurationFromFile(File file, Configuration configuration) 
       Serial.print(configuration.Cookie_Cat_PASSWORD);
       Serial.println();
     } else {
-      Serial.println("Cookie_Cat_PASSWORD not set.");
+      configuration.Cookie_Cat_PASSWORD = "cookiecat";
+      Serial.println("Cookie_Cat_PASSWORD not set or NULL. Empty password is not allowed. Use cookiecat as default.");
     }
   } else {
-    Serial.println("No Cookie_Cat_PASSWORD found in config.json, use okgogogo instead.");
+    configuration.Cookie_Cat_PASSWORD = "cookiecat";
+    Serial.println("No Cookie_Cat_PASSWORD found in config.json, Use cookiecat as default.");
   }
 
   // 连接 WiFi SSID
@@ -179,14 +185,10 @@ Configuration readConfigurationFromFile(File file, Configuration configuration) 
   // 连接 WiFi 密码
   if (config.containsKey("WiFi_PASSWORD")) {
     const char* value = (const char*)config["WiFi_PASSWORD"];
-    if (value && strlen(value) > 0) {
-      configuration.WiFi_PASSWORD = value;
-      Serial.print("Set WiFi_PASSWORD into: ");
-      Serial.print(configuration.WiFi_PASSWORD);
-      Serial.println();
-    } else {
-      Serial.println("WiFi_PASSWORD not set.");
-    }
+    configuration.WiFi_PASSWORD = value;
+    Serial.print("Set WiFi_PASSWORD into: ");
+    Serial.print(configuration.WiFi_PASSWORD);
+    Serial.println();
   } else {
     Serial.println("No WiFi_PASSWORD found in config.json");
   }
@@ -215,7 +217,8 @@ Configuration readConfigurationFromFile(File file, Configuration configuration) 
       Serial.print(configuration.password);
       Serial.println();
     } else {
-      Serial.println("password not set.");
+      configuration.password = value;
+      Serial.println("password not set or NULL.");
     }
   } else {
     Serial.println("No password found in config.json");

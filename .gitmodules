@@ -2,3 +2,6 @@
 	path = Cookie-Cats/data/web-controller
 	url = https://github.com/Cookie-Cats/web-controller.git
     branch = compressed
+[submodule "Cookie-Cats/ESPAsyncWebServer"]
+	path = Cookie-Cats/ESPAsyncWebServer
+	url = https://github.com/nthd/ESPAsyncWebServer.git

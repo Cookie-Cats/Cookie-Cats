@@ -1,9 +1,10 @@
 #include <LittleFS.h>
 #include <WiFiClient.h>
 #include <ESP8266WiFi.h>
-#include <ESP8266WebServer.h>
-#include <ESP8266HTTPClient.h>
+#include <ESPAsyncTCP.h>
+#include <ESPAsyncWebServer.h>
 #include <ArduinoJson.h>
+#include <ESP8266HTTPClient.h>
 #include "functions.h"
 #include "structures.h"
 
@@ -12,9 +13,13 @@ using namespace std;
 WiFiClient wifiClient;
 
 // 在 80 端口实例化 http 服务器
-ESP8266WebServer httpserver(80);
+AsyncWebServer httpserver(80);
 
-Configuration configuration;  // 实例化配置项
+// 实例化 HTTP 客户端
+// AsyncHTTPRequest HTTPClient;
+
+// 实例化配置项
+Configuration configuration;
 
 void setup() {
   // 开启串口
@@ -57,15 +62,26 @@ void setup() {
     Serial.print("Connecting to ");
     Serial.print(configuration.WiFi_SSID);
     Serial.println();
-    while (WiFi.status() != WL_CONNECTED) {
-      delay(100);
-      Serial.print(".");
+
+    for (int i = 0; i < 5; i++) {  // 连接 WiFi，尝试 5 次
+      if (WiFi.status() == WL_CONNECTED) {
+        Serial.println("\nConnected!");
+        Serial.print("IP address for network ");
+        Serial.print(configuration.WiFi_SSID);
+        Serial.print(" : ");
+        Serial.println(WiFi.localIP());
+        break;
+      } else {
+        Serial.print(".");
+        delay(100);
+      }
     }
-    Serial.println("\nConnected!");
-    Serial.print("IP address for network ");
-    Serial.print(configuration.WiFi_SSID);
-    Serial.print(" : ");
-    Serial.println(WiFi.localIP());
+    if (WiFi.status() != WL_CONNECTED) {
+      Serial.print("Cannot connect to ");
+      Serial.print(configuration.WiFi_SSID);
+      Serial.print(". Skip.");
+      Serial.println();
+    }
   } else {
     Serial.println("No WiFi access point configuration found. Skip.");
   }
@@ -73,25 +89,24 @@ void setup() {
   // 启动网络服务器
 
   // 控制面板主页。通过 "/" 或 "/index.html" 访问
-  httpserver.on("/", HTTP_GET, []() {
-    httpserver.sendHeader("Location", "/index.html");
-    httpserver.send(302, "text/plain", "");
+  httpserver.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
+    request->redirect("/index.html");  // 重定向到 /index.html
   });
 
   // 网络状态
   // API。通过访问 "/status/network" 得到
-  httpserver.on("/status/network", HTTP_GET, []() {
+  httpserver.on("/status/network", HTTP_GET, [](AsyncWebServerRequest *request) {
     if (testNet(wifiClient)) {
-      httpserver.send(200, "text/plain", "true");
+      request->send(200, "text/plain", "true");
     } else {
-      httpserver.send(200, "text/plain", "false");
+      request->send(200, "text/plain", "false");
     }
   });
 
   // 获取IP
   // API，通过访问 "/status/ip" 得到
   // TODO：目前仅支持 meow 和 manual，之后将增加其他方法
-  httpserver.on("/status/ip", HTTP_GET, []() {
+  httpserver.on("/status/ip", HTTP_GET, [](AsyncWebServerRequest *request) {
     String ip;
     if (configuration.IP_Obtain_Method.first == "meow") {
       ip = meow(configuration.IP_Obtain_Method.second, wifiClient);
@@ -100,90 +115,90 @@ void setup() {
     } else {
       ip = "No IP method to found, please config IP method in config.json";
     }
-    httpserver.send(200, "text/plain", ip);
+    request->send(200, "text/plain", ip);
   });
 
   // 重启
   // API，访问 "/device/restart" 将立即重启
-  httpserver.on("/device/restart", HTTP_GET, []() {
-    httpserver.send(200, "text/plain", "Restart now.");
+  httpserver.on("/device/restart", HTTP_GET, [](AsyncWebServerRequest *request) {
+    request->send(200, "text/plain", "Restart now.");
     ESP.restart();
   });
 
   // 获取 config.json 内容
   // API，访问 "/config/get"，将以 JSON 格式返回 config.json
-  httpserver.on("/config/get", HTTP_GET, []() {
+  httpserver.on("/config/get", HTTP_GET, [](AsyncWebServerRequest *request) {
     if (LittleFS.exists("/config.json")) {
       File jsonText = LittleFS.open("/config.json", "r");
-      httpserver.send(200, "application/json", jsonText);
+      request->send(LittleFS, "/config.json", "application/json");
     } else {
-      httpserver.send(500, "application/json", "{\"error\":\"No config.json Found.\"}");
+      request->send(500, "application/json", "{\"error\":\"No config.json Found.\"}");
     }
   });
 
   // 保存 config.json 内容
   // API，访问 "/config/save"，将接收客户端 post 的 JSON 数据，并使用 ArduinoJson 读取
   // 如果 JSON 格式合法，将把接收到的 JSON 覆盖保存到 config.json
+  // 警告：如果 JSON 格式不合法，则返回状态码 400，类型 application/json，内容 {"error":"Not a valid JSON object."}
   // 如果保存成功，返回状态码为 200，类型：application/json 内容：{"success":"config.json saved."}
   // 如果保存失败，则返回状态码 500，类型：application/json 内容：{"error":"Failed to save."}
-  // 测试命令：curl -X POST -H "Content-Type: application/json" -d '{"Cookie_Cat_SSID": "CookieCat","Cookie_Cat_PASSWORD": "cookiecat","WiFi_SSID": "OpenWrt","WiFi_PASSWORD": "okgogogo","username": "","password": "","carrier": "","school": "","IP_Obtain_Method": {"meow": "http://192.168.10.151:8080"}}' http://192.168.10.181/config/save 
-  httpserver.on("/config/save", HTTP_POST, []{
-    Serial.println("Receiving config.json...");
-    // 创建一个 JSON 文档对象，用于存储接收到的 JSON 数据
-    DynamicJsonDocument doc(1024);
-    // 尝试从客户端读取 JSON 数据，并解析到文档对象中
-    DeserializationError error = deserializeJson(doc, httpserver.arg("plain"));
-    // 如果解析成功，说明 JSON 格式合法
-    if (!error) {
-      // 尝试打开 config.json 文件，如果不存在则创建一个新文件
-      File jsonConfig = LittleFS.open("/config.json", "w");
-      // 如果文件打开成功，说明可以写入数据
-      if (jsonConfig) {
-        // 将文档对象中的 JSON 数据序列化到文件中
-        serializeJson(doc, jsonConfig);
-        // 关闭文件
-        jsonConfig.close();
-        // 返回成功信息
-        Serial.println("config.json saved.");
-        httpserver.send(200, "application/json", "{\"success\":\"config.json saved.\"}");
+  // 样例：
+  // curl -X POST -H "Content-Type: application/json" -d '{"Cookie_Cat_SSID": "CookieCat","Cookie_Cat_PASSWORD": "cookiecat","WiFi_SSID": "OpenWrt","WiFi_PASSWORD": "okgogogo","username": "","password": "","carrier": "","school": "","IP_Obtain_Method": {"meow": "http://192.168.10.151:8080"}}' http://192.168.10.181/config/save
+  httpserver.on(
+    "/config/save", HTTP_POST, [](AsyncWebServerRequest *request) {}, NULL, [](AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total) {
+      Serial.println("Receiving config.json...");
+      // 创建一个 JSON 文档对象，用于存储接收到的 JSON 数据
+      DynamicJsonDocument doc(1024);
+      // 尝试从客户端读取 JSON 数据，并解析到文档对象中
+      DeserializationError error = deserializeJson(doc, data);
+      // 如果解析成功，说明 JSON 格式合法
+      if (!error) {
+        // 尝试打开 config.json 文件，如果不存在则创建一个新文件
+        File jsonConfig = LittleFS.open("/config.json", "w");
+        // 如果文件打开成功，说明可以写入数据
+        if (jsonConfig) {
+          // 将文档对象中的 JSON 数据序列化到文件中
+          serializeJson(doc, jsonConfig);
+          // 关闭文件
+          jsonConfig.close();
+          // 返回成功信息
+          Serial.println("config.json saved.");
+          request->send(200, "application/json", "{\"success\":\"config.json saved.\"}");
+        } else {
+          // 如果文件打开失败，说明无法写入数据
+          // 返回失败信息
+          Serial.println("Failed to save config.json");
+          request->send(500, "application/json", "{\"error\":\"Failed to save.\"}");
+        }
       } else {
-        // 如果文件打开失败，说明无法写入数据
+        // 如果解析失败，说明 JSON 格式不合法
         // 返回失败信息
-        Serial.println("Failed to save config.json");
-        httpserver.send(500, "application/json", "{\"error\":\"Failed to save.\"}");
+        Serial.println("Invalid JSON format.");
+        request->send(500, "application/json", "{\"error\":\"Invalid JSON format.\"}");
       }
-    } else {
-      // 如果解析失败，说明 JSON 格式不合法
-      // 返回失败信息
-      Serial.println("Invalid JSON format.");
-      httpserver.send(500, "application/json", "{\"error\":\"Invalid JSON format.\"}");
-    }
-  });
+    });
 
   // 处理页面请求
-  httpserver.onNotFound([]() {
+  httpserver.onNotFound([](AsyncWebServerRequest *request) {
     // 获取用户请求网址信息
-    String webAddress = httpserver.uri();
+    String localAddress = "/web-controller/compressed/" + request->url() + ".bin";  // 默认文件以 gz 压缩
 
-    bool fileReadOK = false;
-    String localAddress = "/web-controller/compressed/" + webAddress + ".gz";  // 默认文件以 gz 压缩
-
-    if (LittleFS.exists(localAddress)) {             // 如果访问的文件可以在LittleFS中找到
-      File file = LittleFS.open(localAddress, "r");  // 则尝试打开该文件
-      httpserver.streamFile(file, httpGetContentType(webAddress));
-      file.close();
-    }
-
-    if (!fileReadOK) {
-      httpserver.send(404, "text/plain", "404 Not found.");
+    // 如果文件存在，则发送；否则返回 404。
+    if (LittleFS.exists(localAddress)) {
+      AsyncWebServerResponse *response = request->beginResponse(LittleFS, localAddress, httpGetContentType(request->url()), false);
+      response->addHeader("Content-Encoding", "gzip");
+      request->send(response);
+    } else {
+      request->send(404, "text/plain", "404 Not found.");
     }
   });
 
+  // 启动服务器
   httpserver.begin();
-
   Serial.println("HTTP server started on :80");
+
+  Serial.println("Cookie-Cats Initialized Successfully.");
 }
 
 void loop(void) {
-  httpserver.handleClient();  // 处理客户端请求
 }
