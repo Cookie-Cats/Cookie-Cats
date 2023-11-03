@@ -118,7 +118,7 @@ String httpGetContentType(String filename) {
 }
 
 // 读取配置文件
-Configuration readConfigurationFromFile(File file, Configuration configuration) {
+void readConfigurationFromFile(File file, Configuration& configuration) {
   Serial.println(F("Found config.json, reading..."));
   DynamicJsonDocument config(1024);                            // 分配一个 JSON 文档对象
   DeserializationError error = deserializeJson(config, file);  // 解析文件内容为 JSON 对象
@@ -273,5 +273,4 @@ Configuration readConfigurationFromFile(File file, Configuration configuration) 
     Serial.println(F("IP_Obtain_Method not set or wrong set. IP_Obtain_Method could only be one of meow, manual, unnecessary."));
   }
   Serial.println(F("Read config.json completed."));
-  return configuration;
 }

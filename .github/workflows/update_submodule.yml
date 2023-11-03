@@ -31,4 +31,3 @@ jobs:
           git add Cookie-Cats/data/web-controller
           git commit -m "Update submodule to ${{ github.event.client_payload.commit_id }}"
           git push origin main
-          

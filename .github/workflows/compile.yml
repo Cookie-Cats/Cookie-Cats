@@ -34,6 +34,8 @@ jobs:
           libraries: |
             - name: ArduinoJson
               version: 6.21.3
+            - name: TickTwo
+              version: 4.4.0
           enable-deltas-report: true
           sketches-report-path: ${{ env.SKETCHES_REPORTS_PATH }}
 

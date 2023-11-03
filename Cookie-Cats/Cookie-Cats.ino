@@ -3,9 +3,11 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
 #include <ESP8266HTTPClient.h>
+#include <TickTwo.h>
 #include <ArduinoJson.h>
 #include "functions.h"
 #include "structures.h"
+#include "auth.h"
 
 using namespace std;
 
@@ -14,7 +16,16 @@ WiFiClient wifiClient;
 // 在 80 端口实例化 http 服务器
 ESP8266WebServer httpserver(80);
 
-Configuration configuration;  // 实例化配置项
+// 实例化配置项
+Configuration configuration;
+
+// 认证程序是否启动
+bool startAuth = false;
+// 无论如何都创建用于认证的 Ticker 对象，每 20s 检查一次，是否运行根据 startAuth 判断。
+TickTwo CheckNetAndAuth([] {
+  checkNetAndAuth(configuration, wifiClient);
+},
+                        20000);
 
 void setup() {
   // 开启串口
@@ -32,8 +43,8 @@ void setup() {
   Serial.println(F("Loading config.json..."));
   if (LittleFS.exists("/config.json")) {             // 如果 config.json 可以在LittleFS中找到
     File file = LittleFS.open("/config.json", "r");  // 则尝试打开该文件
-    configuration = readConfigurationFromFile(file, configuration);
-    file.close();  // 关闭文件
+    readConfigurationFromFile(file, configuration);  // 读取配置文件
+    file.close();                                    // 关闭文件
   } else {
     Serial.println(F("No config.json found, use default settings."));
   }
@@ -85,7 +96,6 @@ void setup() {
 
 
   // 启动网络服务器
-
   // 控制面板主页。通过 "/" 或 "/index.html" 访问
   httpserver.on("/", HTTP_GET, []() {
     httpserver.sendHeader("Location", "/index.html");
@@ -194,12 +204,22 @@ void setup() {
   });
 
   httpserver.begin();
-
   Serial.println(F("HTTP server started on :80"));
+
+  // 判断是否开启认证程序
+  if ((configuration.school == "") || (configuration.username == "") || (configuration.password == "")) {
+    Serial.println(F("No school or username or password set. Skip."));
+  } else {
+    Serial.println(F("Configuration of authoriation found. Set startAuth flag to true."));
+    startAuth = true;
+  }
+  CheckNetAndAuth.start();  // 启动 Ticker 对象
 
   Serial.println(F("Cookie-Cats Initialized Successfully."));
 }
 
 void loop(void) {
   httpserver.handleClient();  // 处理客户端请求
+
+  if (startAuth) CheckNetAndAuth.update();  // 判断是否运行认证程序
 }

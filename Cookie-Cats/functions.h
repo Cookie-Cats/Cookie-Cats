@@ -23,6 +23,6 @@ String meow(String meow_url, WiFiClient wifiClient);
 String httpGetContentType(String filename);
 
 // 读取配置文件
-Configuration readConfigurationFromFile(File file, Configuration configuration);
+void readConfigurationFromFile(File file, Configuration &configuration);
 
 #endif  // FUNCTIONS_H
