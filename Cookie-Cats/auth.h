@@ -8,9 +8,9 @@
 #define FUNCTIONS_AUTH
 
 // 先检测是否联网，如果网络断开则认证
-void checkNetAndAuth(Configuration &config, WiFiClient wifiClient);
+void checkNetAndAuth(Configuration &config, WiFiClient &wifiClient);
 
 // 认证
-bool auth(Configuration &config, WiFiClient wifiClient);
+bool auth(Configuration &config, WiFiClient &wifiClient);
 
 #endif  // FUNCTIONS_AUTH

@@ -3,7 +3,7 @@
 
 using namespace std;
 
-bool authChinaPharmaceuticalUniversity(Configuration &config, WiFiClient wifiClient) {
+bool authChinaPharmaceuticalUniversity(Configuration &config, WiFiClient &wifiClient) {
   String carrier;                                             // 转换运营商到认证格式
   if (config.carrier == "ChinaTelecom") carrier = "telecom";  // 已在读取 config 时做过判断，carrier 只能为 "ChinaTelecom", "ChinaUnicom", "ChinaMobile", ""
   else if (config.carrier == "ChinaUnicom") carrier = "unicom";
@@ -40,7 +40,7 @@ bool authChinaPharmaceuticalUniversity(Configuration &config, WiFiClient wifiCli
 
 // 自动认证
 // 警告：使用前需要判断 school、username、password 是否为空
-bool auth(Configuration &config, WiFiClient wifiClient) {
+bool auth(Configuration &config, WiFiClient &wifiClient) {
   Serial.println(F("Starting authoriation..."));
   if (config.school == "ChinaPharmaceuticalUniversity") {  // 中国药科大学
     return authChinaPharmaceuticalUniversity(config, wifiClient);
@@ -50,7 +50,7 @@ bool auth(Configuration &config, WiFiClient wifiClient) {
 }
 
 // 先检测是否联网，如果网络断开则认证
-void checkNetAndAuth(Configuration &config, WiFiClient wifiClient) {
+void checkNetAndAuth(Configuration &config, WiFiClient &wifiClient) {
   if (testNet(wifiClient)) {
     Serial.println(F("Connected to the Internet. No need to auth."));
   } else {

@@ -15,7 +15,7 @@ String randomUA() {
 }
 
 // 检测网络通断
-bool testNet(WiFiClient wifiClient) {
+bool testNet(WiFiClient &wifiClient) {
   Serial.println(F("Start testing the Internet"));
   static const vector<String> testServer = {
     "http://connect.rom.miui.com/generate_204",                    // 小米
@@ -66,7 +66,7 @@ bool testNet(WiFiClient wifiClient) {
 // 方法1：meow
 // 详见：https://github.com/Cookie-Cats/meow
 
-String meow(String meow_url, WiFiClient wifiClient) {
+String meow(String meow_url, WiFiClient &wifiClient) {
   // 定义反馈结果
   String responsePayload = "0.0.0.0";
   for (int i = 0; i < 2; i++) {  // 尝试2次
@@ -118,7 +118,7 @@ String httpGetContentType(String filename) {
 }
 
 // 读取配置文件
-void readConfigurationFromFile(File file, Configuration& configuration) {
+void readConfigurationFromFile(File &file, Configuration &configuration) {
   Serial.println(F("Found config.json, reading..."));
   DynamicJsonDocument config(1024);                            // 分配一个 JSON 文档对象
   DeserializationError error = deserializeJson(config, file);  // 解析文件内容为 JSON 对象

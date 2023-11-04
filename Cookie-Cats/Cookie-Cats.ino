@@ -9,6 +9,10 @@
 #include "structures.h"
 #include "auth.h"
 
+#define VERSION "PIONEER_0.1_alpha"
+#define CONTRIBUTER "77, QiQi, and Cookie-Cats Org"
+#define SERIAL_BAUD 115200  // 串口波特率
+
 using namespace std;
 
 WiFiClient wifiClient;
@@ -29,7 +33,7 @@ TickTwo CheckNetAndAuth([] {
 
 void setup() {
   // 开启串口
-  Serial.begin(9600);
+  Serial.begin(SERIAL_BAUD);
   Serial.println();
 
   // 启动闪存文件系统
@@ -130,6 +134,7 @@ void setup() {
   // 重启
   // API，访问 "/device/restart" 将立即重启
   httpserver.on("/device/restart", HTTP_GET, []() {
+    Serial.println(F("Ready to start. See you later!"));
     httpserver.send(200, "text/plain", "Restart now.");
     ESP.restart();
   });
@@ -138,9 +143,11 @@ void setup() {
   // API，访问 "/config/get"，将以 JSON 格式返回 config.json
   httpserver.on("/config/get", HTTP_GET, []() {
     if (LittleFS.exists("/config.json")) {
+      Serial.println(F("Sending config.json"));
       File jsonText = LittleFS.open("/config.json", "r");
       httpserver.send(200, "application/json", jsonText);
     } else {
+      Serial.println(F("No config.json Found."));
       httpserver.send(500, "application/json", "{\"error\":\"No config.json Found.\"}");
     }
   });
@@ -215,7 +222,22 @@ void setup() {
   }
   CheckNetAndAuth.start();  // 启动 Ticker 对象
 
-  Serial.println(F("Cookie-Cats Initialized Successfully."));
+  Serial.println(F("Cookie-Cats Initialized Successfully.\n\n"));
+  Serial.println(F("  _____            _    _              _____      _       "));
+  Serial.println(F(" / ____|          | |  (_)            / ____|    | |      "));
+  Serial.println(F("| |     ___   ___ | | ___  ___ ______| |     __ _| |_ ___ "));
+  Serial.println(F("| |    / _ \\ / _ \\| |/ / |/ _ \\______| |    / _` | __/ __|"));
+  Serial.println(F("| |___| (_) | (_) |   <| |  __/      | |___| (_| | |_\\__ \\"));
+  Serial.println(F(" \\_____\\___/ \\___/|_|\\_\\_|\\___|       \\_____\\__,_|\\__|___/"));
+  Serial.print(F("\n\n"));
+  Serial.print(F("    Made with Love from "));
+  Serial.print(CONTRIBUTER);
+  Serial.print(F("     \n"));
+  Serial.print(F("                VERSION: "));
+  Serial.print(VERSION);
+  Serial.print(F("                \n"));
+  Serial.println(F("                   Cookie-Cats started.                   "));
+  Serial.println("\n");
 }
 
 void loop(void) {
