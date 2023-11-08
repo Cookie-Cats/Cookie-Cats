@@ -24,6 +24,10 @@ public:
   // manual: ip
   // unnecessary 无value，指定为 0.0.0.0
   std::pair<String, String> IP_Obtain_Method;
+  // 允许 OTA 更新
+  // 只有固件和用户都设置允许才会更新
+  // 默认：true
+  bool allowOTA;
 };
 
 #endif  // STRUCTURES_H

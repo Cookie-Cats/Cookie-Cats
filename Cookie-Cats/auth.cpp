@@ -3,7 +3,7 @@
 
 using namespace std;
 
-bool authChinaPharmaceuticalUniversity(Configuration &config, WiFiClient &wifiClient) {
+bool ICACHE_FLASH_ATTR authChinaPharmaceuticalUniversity(Configuration &config, WiFiClient &wifiClient) {
   String carrier;                                             // 转换运营商到认证格式
   if (config.carrier == "ChinaTelecom") carrier = "telecom";  // 已在读取 config 时做过判断，carrier 只能为 "ChinaTelecom", "ChinaUnicom", "ChinaMobile", ""
   else if (config.carrier == "ChinaUnicom") carrier = "unicom";

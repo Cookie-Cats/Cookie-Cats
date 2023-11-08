@@ -15,7 +15,7 @@ String randomUA() {
 }
 
 // 检测网络通断
-bool testNet(WiFiClient &wifiClient) {
+bool testNet(WiFiClient& wifiClient) {
   Serial.println(F("Start testing the Internet"));
   static const vector<String> testServer = {
     "http://connect.rom.miui.com/generate_204",                    // 小米
@@ -66,7 +66,7 @@ bool testNet(WiFiClient &wifiClient) {
 // 方法1：meow
 // 详见：https://github.com/Cookie-Cats/meow
 
-String meow(String meow_url, WiFiClient &wifiClient) {
+String ICACHE_FLASH_ATTR meow(String meow_url, WiFiClient& wifiClient) {
   // 定义反馈结果
   String responsePayload = "0.0.0.0";
   for (int i = 0; i < 2; i++) {  // 尝试2次
@@ -118,7 +118,7 @@ String httpGetContentType(String filename) {
 }
 
 // 读取配置文件
-void readConfigurationFromFile(File &file, Configuration &configuration) {
+void ICACHE_FLASH_ATTR readConfigurationFromFile(File& file, Configuration& configuration) {
   Serial.println(F("Found config.json, reading..."));
   DynamicJsonDocument config(1024);                            // 分配一个 JSON 文档对象
   DeserializationError error = deserializeJson(config, file);  // 解析文件内容为 JSON 对象
@@ -272,5 +272,38 @@ void readConfigurationFromFile(File &file, Configuration &configuration) {
   } else {
     Serial.println(F("IP_Obtain_Method not set or wrong set. IP_Obtain_Method could only be one of meow, manual, unnecessary."));
   }
+
+  // 是否允许 OTA 更新
+  // 默认为 true
+  if (config.containsKey("allowOTA")) {
+    const char* value = (const char*)config["allowOTA"];
+    if (strcmp(value, "false") == 0) {
+      configuration.allowOTA = false;
+      Serial.println(F("Disable OTA update."));
+    } else {
+      configuration.allowOTA = true;
+      Serial.println(F("Enable OTA update."));
+    }
+  } else {
+    configuration.allowOTA = true;
+    Serial.println(F("No OTA config set, use true as default."));
+  }
+
   Serial.println(F("Read config.json completed."));
+}
+
+// OTA 更新
+void otaUpdate(WiFiClient& wifiClient, String updateURL, String currentVersion) {
+  t_httpUpdate_return ret = ESPhttpUpdate.update(wifiClient, updateURL, currentVersion);
+  switch (ret) {
+    case HTTP_UPDATE_FAILED:
+      Serial.println(F("OTA Update failed."));
+      break;
+    case HTTP_UPDATE_NO_UPDATES:
+      Serial.println(F("Firmware is up to date."));
+      break;
+    case HTTP_UPDATE_OK:
+      Serial.println(F("OTA Update ok."));  // May not be called since we reboot the ESP
+      break;
+  }
 }

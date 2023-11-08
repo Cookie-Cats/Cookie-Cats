@@ -9,9 +9,11 @@
 #include "structures.h"
 #include "auth.h"
 
-#define VERSION "PIONEER_0.1_alpha"
+#define VERSION "PIONEER_0.1_alpha_signed"
 #define CONTRIBUTER "77, QiQi, and Cookie-Cats Org"
 #define SERIAL_BAUD 115200  // 串口波特率
+
+#define ALLOW_OTA_UPDATE true
 
 using namespace std;
 
@@ -30,6 +32,22 @@ TickTwo CheckNetAndAuth([] {
   checkNetAndAuth(configuration, wifiClient);
 },
                         20000);
+
+// 设置 OTA 更新
+#define UPDATE_URL "http://update.cookiecats.diazepam.cc"
+#define ATOMIC_FS_UPDATE  // 允许压缩
+
+BearSSL::PublicKey signPubKey("-----BEGIN PUBLIC KEY-----\n"
+                              "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAsrdoN7eiznoUr5mtJa6W\n"
+                              "FP/KbMWrtIRoblgbHjq43cs8+AwQ9Jebzl8OH9eyVEk8/mLDYtfJeAp1ma5Mwr8U\n"
+                              "TQOKRYe9H+f2haUkf76pmdnU4xvHs5pLWHLuvy+MfCpyi3GTE19ydrCsnLoCZUlV\n"
+                              "AZdhvhyCiIsrx3tocrnNkm6Okbh6ZsSdRS8eepOKIBH7UCXrsC8daR1e59rATCe8\n"
+                              "ULxx6LsFPLDq1ls06RbDUDH4o2Pb2BbqA6XcQSqwxDp/JHjaJ/1w2juXxFHtc8TK\n"
+                              "88drmrIYLPs1QZ1wMieumMR11L9AM6M96CLCa+6oE+yzshEXj0ScA40y/5SsQiMz\n"
+                              "rwIDAQAB\n"
+                              "-----END PUBLIC KEY-----");
+BearSSL::HashSHA256 firmwareHash;
+BearSSL::SigningVerifier sign(&signPubKey);
 
 void setup() {
   // 开启串口
@@ -134,7 +152,7 @@ void setup() {
   // 重启
   // API，访问 "/device/restart" 将立即重启
   httpserver.on("/device/restart", HTTP_GET, []() {
-    Serial.println(F("Ready to start. See you later!"));
+    Serial.println(F("Ready to restart. See you later!"));
     httpserver.send(200, "text/plain", "Restart now.");
     ESP.restart();
   });
@@ -157,7 +175,7 @@ void setup() {
   // 如果 JSON 格式合法，将把接收到的 JSON 覆盖保存到 config.json
   // 如果保存成功，返回状态码为 200，类型：application/json 内容：{"success":"config.json saved."}
   // 如果保存失败，则返回状态码 500，类型：application/json 内容：{"error":"Failed to save."}
-  // 测试命令：curl -X POST -H "Content-Type: application/json" -d '{"Cookie_Cat_SSID": "CookieCat","Cookie_Cat_PASSWORD": "cookiecat","WiFi_SSID": "OpenWrt","WiFi_PASSWORD": "okgogogo","username": "","password": "","carrier": "","school": "","IP_Obtain_Method": {"meow": "http://192.168.10.151:8080"}}' http://192.168.10.181/config/save
+  // 测试命令：curl -X POST -H "Content-Type: application/json" -d '{"Cookie_Cat_SSID": "CookieCat","Cookie_Cat_PASSWORD": "cookiecat","WiFi_SSID": "OpenWrt","WiFi_PASSWORD": "okgogogo","username": "","password": "","carrier": "","school": "","IP_Obtain_Method": {"meow": "http://192.168.10.151:8080"}},"allowOTA": "true"' http://192.168.10.181/config/save
   httpserver.on("/config/save", HTTP_POST, [] {
     Serial.println(F("Receiving config.json..."));
     // 创建一个 JSON 文档对象，用于存储接收到的 JSON 数据
@@ -222,6 +240,15 @@ void setup() {
   }
   CheckNetAndAuth.start();  // 启动 Ticker 对象
 
+  // OTA 升级
+  Update.installSignature(&firmwareHash, &sign);
+  if (ALLOW_OTA_UPDATE && configuration.allowOTA && (WiFi.status() == WL_CONNECTED)) {  // 仅当 ALLOW_OTA_UPDATE 与 configuration.allowOTA 设置为 true 且 WiFi 已连接时更新。因为更新服务器可能在内网，所以不要求可以联网。
+    Serial.println(F("Starting OTA upgrades..."));
+    otaUpdate(wifiClient, UPDATE_URL, VERSION);
+  } else {
+    Serial.println(F("Firmware is set to disallow OTA upgrades."));
+  }
+
   Serial.println(F("Cookie-Cats Initialized Successfully.\n\n"));
   Serial.println(F("  _____            _    _              _____      _       "));
   Serial.println(F(" / ____|          | |  (_)            / ____|    | |      "));
@@ -233,6 +260,7 @@ void setup() {
   Serial.print(F("    Made with Love from "));
   Serial.print(CONTRIBUTER);
   Serial.print(F("     \n"));
+  Serial.println(F("         Homepage: https://github.com/Cookie-Cats         "));
   Serial.print(F("                VERSION: "));
   Serial.print(VERSION);
   Serial.print(F("                \n"));
