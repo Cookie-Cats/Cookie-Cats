@@ -13,7 +13,7 @@
 #define CONTRIBUTER "77, QiQi, and Cookie-Cats Org"
 #define SERIAL_BAUD 115200  // 串口波特率
 
-#define ALLOW_OTA_UPDATE true
+#define ALLOW_OTA_UPDATE false  // 允许 OTA 升级
 
 using namespace std;
 
@@ -21,6 +21,9 @@ WiFiClient wifiClient;
 
 // 在 80 端口实例化 http 服务器
 ESP8266WebServer httpserver(80);
+
+// 设置密钥
+PracticalCrypto secret;
 
 // 实例化配置项
 Configuration configuration;
@@ -61,12 +64,15 @@ void setup() {
     Serial.println(F("LittleFS Failed to Start."));
   }
 
+  // 载入 secret
+  readSecret(secret);
+
   // 载入自定义配置
   Serial.println(F("Loading config.json..."));
-  if (LittleFS.exists("/config.json")) {             // 如果 config.json 可以在LittleFS中找到
-    File file = LittleFS.open("/config.json", "r");  // 则尝试打开该文件
-    readConfigurationFromFile(file, configuration);  // 读取配置文件
-    file.close();                                    // 关闭文件
+  if (LittleFS.exists("/config.json")) {                     // 如果 config.json 可以在LittleFS中找到
+    File file = LittleFS.open("/config.json", "r");          // 则尝试打开该文件
+    readConfigurationFromFile(file, configuration, secret);  // 读取配置文件
+    file.close();                                            // 关闭文件
   } else {
     Serial.println(F("No config.json found, use default settings."));
   }
@@ -178,20 +184,18 @@ void setup() {
   // 测试命令：curl -X POST -H "Content-Type: application/json" -d '{"Cookie_Cat_SSID": "CookieCat","Cookie_Cat_PASSWORD": "cookiecat","WiFi_SSID": "OpenWrt","WiFi_PASSWORD": "okgogogo","username": "","password": "","carrier": "","school": "","IP_Obtain_Method": {"meow": "http://192.168.10.151:8080"}},"allowOTA": "true"' http://192.168.10.181/config/save
   httpserver.on("/config/save", HTTP_POST, [] {
     Serial.println(F("Receiving config.json..."));
-    // 创建一个 JSON 文档对象，用于存储接收到的 JSON 数据
-    DynamicJsonDocument doc(1024);
-    // 尝试从客户端读取 JSON 数据，并解析到文档对象中
-    DeserializationError error = deserializeJson(doc, httpserver.arg("plain"));
-    // 如果解析成功，说明 JSON 格式合法
-    if (!error) {
-      // 尝试打开 config.json 文件，如果不存在则创建一个新文件
-      File jsonConfig = LittleFS.open("/config.json", "w");
-      // 如果文件打开成功，说明可以写入数据
+    DynamicJsonDocument doc(1024);                                               // 创建一个 JSON 文档对象，用于存储接收到的 JSON 数据
+    DeserializationError error = deserializeJson(doc, httpserver.arg("plain"));  // 尝试从客户端读取 JSON 数据，并解析到文档对象中
+
+    if (doc.containsKey("password")) {  // 如果用户填写了密码项，则进行加密
+      doc["password"] = secret.encrypt(doc["password"]);
+    }
+
+    if (!error) {                                            // 如果解析成功，说明 JSON 格式合法
+      File jsonConfig = LittleFS.open("/config.json", "w");  // 尝试打开 config.json 文件，如果不存在则创建一个新文件
       if (jsonConfig) {
-        // 将文档对象中的 JSON 数据序列化到文件中
-        serializeJson(doc, jsonConfig);
-        // 关闭文件
-        jsonConfig.close();
+        serializeJson(doc, jsonConfig);  // 将文档对象中的 JSON 数据序列化到文件中
+        jsonConfig.close();              // 关闭文件
         // 返回成功信息
         Serial.println(F("config.json saved."));
         httpserver.send(200, "application/json", "{\"success\":\"config.json saved.\"}");

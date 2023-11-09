@@ -118,7 +118,7 @@ String httpGetContentType(String filename) {
 }
 
 // 读取配置文件
-void ICACHE_FLASH_ATTR readConfigurationFromFile(File& file, Configuration& configuration) {
+void ICACHE_FLASH_ATTR readConfigurationFromFile(File& file, Configuration& configuration, PracticalCrypto& secret) {
   Serial.println(F("Found config.json, reading..."));
   DynamicJsonDocument config(1024);                            // 分配一个 JSON 文档对象
   DeserializationError error = deserializeJson(config, file);  // 解析文件内容为 JSON 对象
@@ -208,10 +208,8 @@ void ICACHE_FLASH_ATTR readConfigurationFromFile(File& file, Configuration& conf
   if (config.containsKey("password")) {
     const char* value = (const char*)config["password"];
     if (value && strlen(value) > 0) {
-      configuration.password = value;
-      Serial.print(F("Set password into: "));
-      Serial.print(configuration.password);
-      Serial.println();
+      configuration.password = secret.decrypt(value);
+      Serial.println(F("The password is set."));
     } else {
       configuration.password = value;
       Serial.println(F("password not set or NULL."));
@@ -293,7 +291,7 @@ void ICACHE_FLASH_ATTR readConfigurationFromFile(File& file, Configuration& conf
 }
 
 // OTA 更新
-void otaUpdate(WiFiClient& wifiClient, String updateURL, String currentVersion) {
+void ICACHE_FLASH_ATTR otaUpdate(WiFiClient& wifiClient, String updateURL, String currentVersion) {
   t_httpUpdate_return ret = ESPhttpUpdate.update(wifiClient, updateURL, currentVersion);
   switch (ret) {
     case HTTP_UPDATE_FAILED:
@@ -305,5 +303,27 @@ void otaUpdate(WiFiClient& wifiClient, String updateURL, String currentVersion) 
     case HTTP_UPDATE_OK:
       Serial.println(F("OTA Update ok."));  // May not be called since we reboot the ESP
       break;
+  }
+}
+
+// 读取是否存在 .secret 密钥文件
+// 如果不存在，就生成一个
+void ICACHE_FLASH_ATTR readSecret(PracticalCrypto& secret) {
+  // 读取是否存在 .secret 密钥文件
+  // 如果不存在，就生成一个
+  Serial.println(F("Loading secret..."));
+  if (LittleFS.exists("/.secret")) {
+    File file = LittleFS.open("/.secret", "r");
+    String data = file.readString();
+    secret.setKey(data);
+    file.close();
+    Serial.println(F("Found secret."));
+  } else {
+    File file = LittleFS.open("/.secret", "w");
+    String key = secret.generateKey();  // 生成密钥
+    file.write(key.c_str());
+    file.close();        // 写入密钥，关闭文件
+    secret.setKey(key);  // 设置密钥
+    Serial.println(F("Cannot find secret, generate a new one."));
   }
 }

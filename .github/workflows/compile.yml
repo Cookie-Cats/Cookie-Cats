@@ -36,6 +36,9 @@ jobs:
               version: 6.21.3
             - name: TickTwo
               version: 4.4.0
+            - name: PracticalCrypto
+              version: 0.1.0
+              source-url: https://github.com/gutierrezps/PracticalCrypto.git
           enable-deltas-report: true
           sketches-report-path: ${{ env.SKETCHES_REPORTS_PATH }}
 
