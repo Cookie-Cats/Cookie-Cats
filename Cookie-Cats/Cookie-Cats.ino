@@ -8,6 +8,7 @@
 #include "functions.h"
 #include "structures.h"
 #include "auth.h"
+#include "webpages.h"
 
 #define VERSION "PIONEER_0.1_alpha_signed"
 #define CONTRIBUTER "77, QiQi, and Cookie-Cats Org"
@@ -66,6 +67,8 @@ void setup() {
 
   // 载入 secret
   readSecret(secret);
+  // 载入证书
+  Update.installSignature(&firmwareHash, &sign);
 
   // 载入自定义配置
   Serial.println(F("Loading config.json..."));
@@ -213,22 +216,55 @@ void setup() {
     }
   });
 
+  // 返回固件版本
+  // API，访问 "/firmware/version" 将返回固件版本和作者信息
+  httpserver.on("/firmware/version", HTTP_GET, []() {
+    char version[128];
+    strcat(version, "Cookie-Cats(");
+    strcat(version, VERSION);
+    strcat(version, ")by ");
+    strcat(version, CONTRIBUTER);
+    httpserver.send(200, "text/plain", version);
+  });
+
+  // 是否允许自动更新
+  // API，访问 "/firmware/allowupdate" 将返回是否允许自动更新
+  httpserver.on("/firmware/allowupdate", HTTP_GET, []() {
+    if (ALLOW_OTA_UPDATE && configuration.allowOTA && (WiFi.status() == WL_CONNECTED)) {
+      httpserver.send(200, "text/plain", "true");
+    } else {
+      httpserver.send(200, "text/plain", "false");
+    }
+  });
+
+  // 强制更新固件
+  // API，访问 "/firmware/update" 将强制更新，忽略固件和用户设置
+  // 警告：返回值无实际意义。
+  httpserver.on("/firmware/update", HTTP_GET, []() {
+    Serial.println(F("Updating firmware..."));
+    otaUpdate(wifiClient, UPDATE_URL, VERSION);
+    httpserver.send(200, "text/plain", "Ok.");
+  });
+
+  // 返回认证程序是否启动
+  // API，访问 "/auth/status" 返回认证程序状态
+  httpserver.on("/auth/status", HTTP_GET, []() {
+    if (startAuth) {
+      httpserver.send(200, "text/plain", "true");
+    } else {
+      httpserver.send(200, "text/plain", "false");
+    }
+  });
+
   // 处理页面请求
   httpserver.onNotFound([]() {
-    // 获取用户请求网址信息
-    String webAddress = httpserver.uri();
+    String webAddress = httpserver.uri();  // 获取用户请求网址信息
+    String page = webPages(webAddress);    // 读取网页
 
-    bool fileReadOK = false;
-    String localAddress = "/web-controller/compressed/" + webAddress + ".gz";  // 默认文件以 gz 压缩
-
-    if (LittleFS.exists(localAddress)) {             // 如果访问的文件可以在LittleFS中找到
-      File file = LittleFS.open(localAddress, "r");  // 则尝试打开该文件
-      httpserver.streamFile(file, httpGetContentType(webAddress));
-      file.close();
-    }
-
-    if (!fileReadOK) {
+    if (page == "") {  // 如果没找到网页
       httpserver.send(404, "text/plain", "404 Not found.");
+    } else {  // 如果可以找到网页
+      httpserver.send(200, httpGetContentType(webAddress), page);
     }
   });
 
@@ -245,7 +281,6 @@ void setup() {
   CheckNetAndAuth.start();  // 启动 Ticker 对象
 
   // OTA 升级
-  Update.installSignature(&firmwareHash, &sign);
   if (ALLOW_OTA_UPDATE && configuration.allowOTA && (WiFi.status() == WL_CONNECTED)) {  // 仅当 ALLOW_OTA_UPDATE 与 configuration.allowOTA 设置为 true 且 WiFi 已连接时更新。因为更新服务器可能在内网，所以不要求可以联网。
     Serial.println(F("Starting OTA upgrades..."));
     otaUpdate(wifiClient, UPDATE_URL, VERSION);

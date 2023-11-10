@@ -101,19 +101,11 @@ String ICACHE_FLASH_ATTR meow(String meow_url, WiFiClient& wifiClient) {
 }
 
 // 用于 http 服务器，获取文件类型
-String httpGetContentType(String filename) {
+String ICACHE_FLASH_ATTR httpGetContentType(String filename) {
   if (filename.endsWith(".htm")) return "text/html";
   else if (filename.endsWith(".html")) return "text/html";
   else if (filename.endsWith(".css")) return "text/css";
   else if (filename.endsWith(".js")) return "application/javascript";
-  else if (filename.endsWith(".png")) return "image/png";
-  else if (filename.endsWith(".gif")) return "image/gif";
-  else if (filename.endsWith(".jpg")) return "image/jpeg";
-  else if (filename.endsWith(".ico")) return "image/x-icon";
-  else if (filename.endsWith(".xml")) return "text/xml";
-  else if (filename.endsWith(".pdf")) return "application/x-pdf";
-  else if (filename.endsWith(".zip")) return "application/x-zip";
-  else if (filename.endsWith(".gz")) return "application/gzip";
   return "text/plain";
 }
 
