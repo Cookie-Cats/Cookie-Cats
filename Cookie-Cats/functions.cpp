@@ -227,7 +227,7 @@ void ICACHE_FLASH_ATTR readConfigurationFromFile(File& file, Configuration& conf
 
   // 学校
   if (config.containsKey("school")) {
-    vector<String> Schools = { "ChinaPharmaceuticalUniversity" };
+    vector<String> Schools = { "ChinaPharmaceuticalUniversityDormitory" };
     const char* school = (const char*)config["school"];
 
     auto it = find(Schools.begin(), Schools.end(), school);  // 遍历支持的学校列表
@@ -241,26 +241,33 @@ void ICACHE_FLASH_ATTR readConfigurationFromFile(File& file, Configuration& conf
   }
 
   // IP 获取方式
-  if (config.containsKey("IP_Obtain_Method")) {
-    JsonObject IP_Obtain_Method = config["IP_Obtain_Method"];
-    if (IP_Obtain_Method.containsKey("meow")) {  // 采用 meow
-      const char* url = (const char*)IP_Obtain_Method["meow"];
-      configuration.IP_Obtain_Method = { "meow", url };
-      Serial.print(F("Set meow URL: "));
-      Serial.print(url);
-      Serial.println();
-    } else if (IP_Obtain_Method.containsKey("manual")) {  // 采用 manual
-      const char* ip = (const char*)IP_Obtain_Method["manual"];
-      configuration.IP_Obtain_Method = { "manual", ip };
-      Serial.print(F("Get manual input IP: "));
-      Serial.print(ip);
-      Serial.println();
-    } else if (IP_Obtain_Method.containsKey("unnecessary")) {  // 采用 unnecessary
-      configuration.IP_Obtain_Method = { "unnecessary", "0.0.0.0" };
-      Serial.println(F("Set IP_Obtain_Method into unnecessary."));
+  if (config.containsKey("IP_Obtain_Method_Content")) {
+    const char* IP_Obtain_Method_Content = (const char*)config["IP_Obtain_Method_Content"];
+    if (IP_Obtain_Method_Content && strlen(IP_Obtain_Method_Content) > 0) {  // 如果 IP_Obtain_Method_Content 不为空
+      if (config.containsKey("IP_Obtain_Method")) {
+        const char* IP_Obtain_Method = (const char*)config["IP_Obtain_Method"];
+        vector<String> IP_Obtain_Methods = { "unnecessary", "meow", "manual" };
+        auto it = find(IP_Obtain_Methods.begin(), IP_Obtain_Methods.end(), IP_Obtain_Method);
+        if (it != IP_Obtain_Methods.end()) {  // 如果找到了方法
+          configuration.IP_Obtain_Method = IP_Obtain_Method;
+          configuration.IP_Obtain_Method_Content = IP_Obtain_Method_Content;
+          Serial.print(F("Set IP_Obtain_Method to:"));
+          Serial.print(IP_Obtain_Method);
+          Serial.println();
+          Serial.print(F("Set IP_Obtain_Method_Content to: "));
+          Serial.print(IP_Obtain_Method_Content);
+          Serial.println();
+        } else {
+          Serial.println(F("Unsupported IP_Obtain_Method. IP_Obtain_Method could only be one of meow, manual, unnecessary. Skip."));
+        }
+      } else {
+        Serial.println(F("No IP_Obtain_Method found. Skip."));
+      }
+    } else {
+      Serial.println(F("IP_Obtain_Method_Content is None. Skip."));
     }
   } else {
-    Serial.println(F("IP_Obtain_Method not set or wrong set. IP_Obtain_Method could only be one of meow, manual, unnecessary."));
+    Serial.println(F("No IP_Obtain_Method_Content found. Skip."));
   }
 
   // 是否允许 OTA 更新
@@ -318,4 +325,27 @@ void ICACHE_FLASH_ATTR readSecret(PracticalCrypto& secret) {
     secret.setKey(key);  // 设置密钥
     Serial.println(F("Cannot find secret, generate a new one."));
   }
+}
+
+// 定义一个函数，参数为times，表示 led 闪烁的次数，闪灯间隔 200 毫秒
+void blink(int times) {
+  unsigned long last_change = 0;  // 定义一个变量，表示上一次改变led状态的时间，初始为0
+  unsigned long interval = 200;   // 闪灯间隔 200 毫秒
+  int count = 0;                  // 已经闪烁的次数
+  bool LED_STATE = true;          // LED 状态
+
+  if (digitalRead(LED_BUILTIN) == false) digitalWrite(LED_BUILTIN, true);  // 如果初始为 HIGH，则改为 LOW
+
+  while (count < times) {                            // 使用一个循环，直到闪烁的次数达到参数times为止
+    unsigned long current_time = millis();           // 获取当前的时间，单位为毫秒
+    if (current_time - last_change >= interval) {    // 如果当前时间减去上一次改变led状态的时间大于或等于闪灯间隔
+      LED_STATE = LED_STATE == true ? false : true;  // 则改变led的状态，如果原来是LOW，就变成HIGH，反之亦然
+      digitalWrite(LED_BUILTIN, LED_STATE);          // 将led的状态写入led引脚
+      last_change = current_time;                    // 更新上一次改变led状态的时间为当前时间
+      if (LED_STATE == true) {                       // 如果led的状态是LOW，说明已经完成了一次闪烁，将闪烁次数加一
+        count++;
+      }
+    }
+  }
+  digitalWrite(LED_BUILTIN, true);  // 熄灯
 }

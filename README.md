@@ -1,1 +1,155 @@
 # Cookie-Cats
+
+一个基于 ESP8266 开发的简约智能的校园网自动化认证工具。
+
+<img src="imgs/Cookie-Cats.jpg" width=40% height=40% />
+
+## 功能设计
+
+* **界面简约**，小白也可轻松使用；
+* **模块化设计**，易于二次开发：目前已支持认证中国药科大学宿舍网。仅需几行代码即可认证其他平台，详见[开发文档](#开发文档)；
+* **架构独特，适配所有路由**：**无需**使用昂贵的带有认证功能的路由器，仅需一个便宜好用的 Cookie-Cats，即可免除一切烦恼；
+* **自动离线检测**：每 20 秒检测一次连接情况，离线自动重新认证；
+* **安全保护**：认证密钥使用 AES128-CBC 算法**加密保存**，无法被读取；**固件签名**技术保护您的 Cookie-Cats 免受恶意固件的攻击；
+* **自动更新**：搭配 **Cloudflare Workers 边缘函数**与 **Cloudflare R2 全球分布式存储**分发固件；仅需**重启设备**即可自动更新固件；
+* **开源共建**：固件源代码开源，无需担心后门。
+
+<img src="imgs/interface.png" width=80% height=80% />
+
+## 使用指南
+
+1. 为你的 Cookie-Cats 连接电源；
+
+2. 稍等几秒，直到 LED 连续闪烁 5 次，你可以找到 WiFi 名称为类似： “CookieCat-xxxx” 的 WiFi（xxxx为任意字符）。连接 WiFi，默认密码为`cookiecat`。你可以稍后自定义 WiFi 名与密码（一定要记住密码哦！如果忘记，请在[常见问题](#常见问题)中寻找答案）；
+
+3. 打开浏览器，在地址栏输入 [http://192.168.4.1](http://192.168.4.1)，即可打开配置界面；
+
+4. 在 [认证系统使用指南](#认证系统使用指南) 中找到自己的学校并按要求配置，点击 “我输入好啦～”，设备将自动重启后自动开始认证；
+
+5. **断开 CookieCat-xxxx 的 WiFi，连接自己的 WiFi**，开启快乐网上冲浪！🏄🏄🏄
+
+   **注意：Cookie-Cat 的 WiFi 是无法联网的。如果你遇到了已连接 WiFi 但无法上网的问题，请检查是否错误连接了 Cookie-Cat 的WiFi。建议取消自动连接 Cookie-Cat 的 WiFi。**
+
+## 认证系统使用指南
+
+* 中国药科大学宿舍网
+
+  1. 将[路由器设置为 DHCP 客户端模式](https://lic.cpu.edu.cn/ee/c5/c7550a192197/page.htm)；
+  2. 绑定[运营商宽带与统一身份认证](https://lic.cpu.edu.cn/ee/c6/c7550a192198/page.htm)；
+  3. 阅读 [使用指南](#使用指南)，打开配置界面（第三步）；
+  4. 按图填写配置信息：
+
+  <img src="imgs/cpu_d1.png" width=80% height=80% />
+
+  5. CookieCats 将自动重启。如果 LED 灯在通电后 50 秒内快速闪烁 5 次，则连接 WiFi 成功；否则请见[常见问题](#常见问题)的第三个问题；
+  6. 如果 LED 连续闪烁 2 次，则为检测到网络断开、自动连接；如果 LED 闪烁 1 次，则为网络连接正常。CookieCats 每隔 20 秒会自动检测连接状态；
+  7. 按照 [使用指南](#使用指南) 第 5 步操作。
+
+## 常见问题
+
+1. 如何重置 Cookie-Cats 配置？
+
+   * 如果我**可以**连接 Cookie-Cats 的 WiFi
+
+     连接 Cookie-Cats 的 WiFi。在地址栏输入 [http://192.168.4.1](http://192.168.4.1)，打开配置界面，点击“清除配置”即可。
+
+   * 如果我**无法**连接 Cookie-Cats 的 WiFi（如忘记了密码）
+
+     连接 Cookie-Cats 设定的路由器 WiFi，打开路由管理界面，在 DHCP 客户端中找到设备名为 Cookie-Cats 的设备。获得其 IP，在浏览器输入 `http://IP地址` 即可。
+
+
+2. 如何判断 CookieCats 已正常连接 WiFi？
+
+   将 CookieCats 断电后重新连接电源。如果 LED 灯在通电后 50 秒内快速闪烁 5 次，则连接 WiFi 成功。
+
+   如果不能连接，请确认：
+
+   * **你输入了正确的 WiFi 名和密码**；
+   * 如果你的 WiFi 同时支持 2.4 GHz 和 5GHz，请确保 CookieCats 在尝试连接 2.4 GHz 的 WiFi（如果你的路由器 WiFi 名为 TP_LINK_K7DS 和 TP_LINK_5G_K7DS，请连接 TP_LINK_K7DS）。
+   * CookieCats 在 WiFi 信号范围内；
+   * 如果你的 WiFi 设置了 MAC 白名单，请将 CookieCats 网卡 MAC 地址加入白名单中；
+
+3. 如果我输入了错误的连接 WiFi 名和密码导致无法连接到路由器怎么办？
+
+​	请稍等约一分钟，**直到 LED 闪烁 5 次**，连接 CookieCats 的 WiFi，在浏览器中打开 [http://192.168.4.1](http://192.168.4.1)，即可重新配置。
+
+4. 遇到无法解决的错误怎么办？
+
+* 如果你是电脑小白，请联系售卖此硬件的提供商。
+* 如果你是电脑高手，请打开一个 [Issue](https://github.com/Cookie-Cats/Cookie-Cats/issues) 反馈，帮助我们一起修复错误。
+
+5. 这个项目是开源的，是否意味着我可以自行购买开发版和使用此固件？
+
+   当然可以。请遵循 [许可证](#许可证)。
+
+## 开发文档
+
+1. 如何添加自己学校的认证方式？
+
+2. 如何部署 Cookie-Cats 所需的开发环境？
+
+   * 安装 [Arduino IDE](https://www.arduino.cc/en/software)（1.x 或 2.x 版本皆可）。
+
+   * 安装 [ESP8266 Arduino Core](https://github.com/esp8266/Arduino)
+
+     * 请参考 https://github.com/esp8266/Arduino#installing-with-boards-manager
+
+   * 安装依赖库
+
+     * ArduinoJson，请参考：https://arduinojson.org/v6/doc/installation
+     * TickTwo，请参考：https://github.com/sstaub/TickTwo#installation
+     * PracticalCrypto
+       * 打开 https://github.com/gutierrezps/PracticalCrypto
+       * 点击 Code -> Download ZIP
+       * 打开 Arduino IDE，在菜单栏中选择 `项目` -> `导入库` -> `添加.ZIP库...` ->选择下载的 ZIP 导入即可。
+
+   * 根据你的硬件 USB 转串口桥接器（如CH340、CP2102）安装驱动程序。
+
+   * 克隆 Cookie-Cats 到本地
+
+     ```bash
+     git clone https://github.com/Cookie-Cats/Cookie-Cats.git
+     ```
+
+   * 打开 Cookie-Cats/Cookie-Cats/Cookie-Cats.ino
+
+   * 在 IDE 中选择你的开发版和串口
+
+   * 将串口波特率设置为 `115200`
+
+   * 开始开发
+
+3. 如何制作自己的 Cookie-Cats？
+
+   * 购买硬件：本固件理论上在任何存储空间为 4MB 的 ESP8266 开发版上均可运行。
+
+     以下开发版经过测试可用：LOLIN D1 mini、NodeMCU。
+
+4. 我校的认证系统需要提供路由器的 IP 地址，如何获取？（未写完）
+
+   请看如下网络拓扑图：
+
+   ```mermaid
+   graph TD;
+       内网DHCP服务器-->内网路由器;
+   ```
+   
+   
+
+## 引用与鸣谢
+
+* [ESP8266 Arduino Core](https://github.com/esp8266/Arduino)，基于 GNU Lesser General Public License v2.1 许可下分发；
+* [ArduinoJson](https://arduinojson.org)，基于 MIT License 许可下分发；
+* [TickTwo](https://github.com/sstaub/TickTwo)，基于 MIT License 许可下分发；
+* [LittleFS](https://github.com/littlefs-project/littlefs)，基于 BSD 3-clause license 许可下分发；
+* [PracticalCrypto](https://github.com/gutierrezps/PracticalCrypto)，基于 GNU Lesser General Public License v2.1 许可下分发。
+
+## 许可证
+
+[Cookie-Cats](https://github.com/Cookie-Cats/Cookie-Cats) 在 GNU General Public License v3.0 的改进许可下发行。
+
+改进许可指：你可以自由地在 GNU General Public License v3.0 许可下对本项目进行商业使用。每个 CookieCats 消费者的总付费（包括月租等方式）必须小于使用场景下运营商宽带最低包月价格。
+
+## 文档版本
+
+适用于CookieCats PIONEER_0.1_alpha_prerelease_010。

@@ -4,7 +4,6 @@
 #include <ESP8266httpUpdate.h>
 #include <LittleFS.h>
 #include <PracticalCrypto.h>
-#include <vector>
 #include "structures.h"
 
 #ifndef FUNCTIONS_H
@@ -33,5 +32,8 @@ void ICACHE_FLASH_ATTR otaUpdate(WiFiClient &wifiClient, String updateURL, Strin
 // 读取是否存在 .secret 密钥文件
 // 如果不存在，就生成一个
 void ICACHE_FLASH_ATTR readSecret(PracticalCrypto &secret);
+
+// 定义一个函数，参数为times，表示 led 闪烁的次数，闪灯间隔 200 毫秒
+void blink(int times);
 
 #endif  // FUNCTIONS_H

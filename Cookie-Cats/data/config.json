@@ -1,14 +1,13 @@
 {
 	"Cookie_Cat_SSID": "CookieCat",
 	"Cookie_Cat_PASSWORD": "cookiecat",
-	"WiFi_SSID": "OpenWrt",
-	"WiFi_PASSWORD": "okgogogo",
+	"WiFi_SSID": "",
+	"WiFi_PASSWORD": "",
 	"username": "",
 	"password": "",
 	"carrier": "",
         "school": "",
-	"IP_Obtain_Method": {
-		"meow": "http://192.168.10.151:8080"
-	},
-	"allowOTA": "true"
+	"IP_Obtain_Method": "meow",
+	"IP_Obtain_Method_Content": "http://192.168.10.151:8080",
+	"allowOTA": "false"
 }

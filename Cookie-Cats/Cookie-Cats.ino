@@ -10,11 +10,11 @@
 #include "auth.h"
 #include "webpages.h"
 
-#define VERSION "PIONEER_0.1_alpha_signed"
+#define VERSION "PIONEER_0.1_alpha_prerelease_010"
 #define CONTRIBUTER "77, QiQi, and Cookie-Cats Org"
 #define SERIAL_BAUD 115200  // 串口波特率
 
-#define ALLOW_OTA_UPDATE false  // 允许 OTA 升级
+#define ALLOW_OTA_UPDATE true  // 允许 OTA 升级
 
 using namespace std;
 
@@ -39,17 +39,22 @@ TickTwo CheckNetAndAuth([] {
 
 // 设置 OTA 更新
 #define UPDATE_URL "http://update.cookiecats.diazepam.cc"
+
 #define ATOMIC_FS_UPDATE  // 允许压缩
 
-BearSSL::PublicKey signPubKey("-----BEGIN PUBLIC KEY-----\n"
-                              "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAsrdoN7eiznoUr5mtJa6W\n"
-                              "FP/KbMWrtIRoblgbHjq43cs8+AwQ9Jebzl8OH9eyVEk8/mLDYtfJeAp1ma5Mwr8U\n"
-                              "TQOKRYe9H+f2haUkf76pmdnU4xvHs5pLWHLuvy+MfCpyi3GTE19ydrCsnLoCZUlV\n"
-                              "AZdhvhyCiIsrx3tocrnNkm6Okbh6ZsSdRS8eepOKIBH7UCXrsC8daR1e59rATCe8\n"
-                              "ULxx6LsFPLDq1ls06RbDUDH4o2Pb2BbqA6XcQSqwxDp/JHjaJ/1w2juXxFHtc8TK\n"
-                              "88drmrIYLPs1QZ1wMieumMR11L9AM6M96CLCa+6oE+yzshEXj0ScA40y/5SsQiMz\n"
-                              "rwIDAQAB\n"
-                              "-----END PUBLIC KEY-----");
+const char pubkey[] PROGMEM = R"EOF(
+-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAsrdoN7eiznoUr5mtJa6W
+FP/KbMWrtIRoblgbHjq43cs8+AwQ9Jebzl8OH9eyVEk8/mLDYtfJeAp1ma5Mwr8U
+TQOKRYe9H+f2haUkf76pmdnU4xvHs5pLWHLuvy+MfCpyi3GTE19ydrCsnLoCZUlV
+AZdhvhyCiIsrx3tocrnNkm6Okbh6ZsSdRS8eepOKIBH7UCXrsC8daR1e59rATCe8
+ULxx6LsFPLDq1ls06RbDUDH4o2Pb2BbqA6XcQSqwxDp/JHjaJ/1w2juXxFHtc8TK
+88drmrIYLPs1QZ1wMieumMR11L9AM6M96CLCa+6oE+yzshEXj0ScA40y/5SsQiMz
+rwIDAQAB
+-----END PUBLIC KEY-----
+)EOF";
+
+BearSSL::PublicKey signPubKey(pubkey);
 BearSSL::HashSHA256 firmwareHash;
 BearSSL::SigningVerifier sign(&signPubKey);
 
@@ -57,6 +62,11 @@ void setup() {
   // 开启串口
   Serial.begin(SERIAL_BAUD);
   Serial.println();
+
+  // 设置 LED 引脚为输出模式
+  // 使用内置 LED 为输出引脚
+  pinMode(LED_BUILTIN, OUTPUT);
+  digitalWrite(LED_BUILTIN, true);  // 熄灯
 
   // 启动闪存文件系统
   if (LittleFS.begin()) {
@@ -82,6 +92,7 @@ void setup() {
 
   // 设置 WiFi
   WiFi.mode(WIFI_AP_STA);
+  WiFi.hostname("Cookie-Cats");
 
   WiFi.softAP(configuration.Cookie_Cat_SSID, configuration.Cookie_Cat_PASSWORD);  // 设置 WiFi 接入点
   Serial.print(F("WiFi access point SSID: "));
@@ -148,10 +159,10 @@ void setup() {
   // TODO：目前仅支持 meow 和 manual，之后将增加其他方法
   httpserver.on("/status/ip", HTTP_GET, []() {
     String ip;
-    if (configuration.IP_Obtain_Method.first == "meow") {
-      ip = meow(configuration.IP_Obtain_Method.second, wifiClient);
-    } else if (configuration.IP_Obtain_Method.first == "manual") {
-      ip = configuration.IP_Obtain_Method.second;
+    if (configuration.IP_Obtain_Method == "meow") {
+      ip = meow(configuration.IP_Obtain_Method_Content, wifiClient);
+    } else if (configuration.IP_Obtain_Method == "manual") {
+      ip = configuration.IP_Obtain_Method_Content;
     } else {
       ip = "No IP method to found, please config IP method in config.json";
     }
@@ -184,13 +195,13 @@ void setup() {
   // 如果 JSON 格式合法，将把接收到的 JSON 覆盖保存到 config.json
   // 如果保存成功，返回状态码为 200，类型：application/json 内容：{"success":"config.json saved."}
   // 如果保存失败，则返回状态码 500，类型：application/json 内容：{"error":"Failed to save."}
-  // 测试命令：curl -X POST -H "Content-Type: application/json" -d '{"Cookie_Cat_SSID": "CookieCat","Cookie_Cat_PASSWORD": "cookiecat","WiFi_SSID": "OpenWrt","WiFi_PASSWORD": "okgogogo","username": "","password": "","carrier": "","school": "","IP_Obtain_Method": {"meow": "http://192.168.10.151:8080"}},"allowOTA": "true"' http://192.168.10.181/config/save
+  // 测试命令：curl -X POST -H "Content-Type: application/json" -d '{"Cookie_Cat_SSID": "CookieCat","Cookie_Cat_PASSWORD": "cookiecat","WiFi_SSID": "OpenWrt","WiFi_PASSWORD": "okgogogo","username": "","password": "","carrier": "","school": "","IP_Obtain_Method": "meow", "IP_Obtain_Method_Content": "http://192.168.10.151:8080","allowOTA": "true"}' http://192.168.10.181/config/save
   httpserver.on("/config/save", HTTP_POST, [] {
     Serial.println(F("Receiving config.json..."));
     DynamicJsonDocument doc(1024);                                               // 创建一个 JSON 文档对象，用于存储接收到的 JSON 数据
     DeserializationError error = deserializeJson(doc, httpserver.arg("plain"));  // 尝试从客户端读取 JSON 数据，并解析到文档对象中
 
-    if (doc.containsKey("password")) {  // 如果用户填写了密码项，则进行加密
+    if (doc.containsKey("password") && doc["password"] != "") {  // 如果用户填写了密码项，则进行加密
       doc["password"] = secret.encrypt(doc["password"]);
     }
 
@@ -213,6 +224,20 @@ void setup() {
       // 返回失败信息
       Serial.println(F("Invalid JSON format."));
       httpserver.send(500, "application/json", "{\"error\":\"Invalid JSON format.\"}");
+    }
+  });
+
+  // 重置配置
+  // API，访问 "/config/rmconfig"，将删除 LittleFS 上保存的 config.json
+  httpserver.on("/config/rmconfig", HTTP_GET, []() {
+    if (LittleFS.exists("/config.json")) {
+      LittleFS.remove("/config.json");
+      Serial.println(F("Removed config.json"));
+      httpserver.send(200, "text/plain", "Removed config.json");
+      ESP.restart();  // 重启以刷新配置
+    } else {
+      Serial.println(F("No config.json Found."));
+      httpserver.send(500, "text/plain", "No config.json found.");
     }
   });
 
@@ -305,6 +330,10 @@ void setup() {
   Serial.print(F("                \n"));
   Serial.println(F("                   Cookie-Cats started.                   "));
   Serial.println("\n");
+
+  blink(5);  // 闪烁 5 次，代表初始化成功
+
+  if (startAuth) checkNetAndAuth(configuration, wifiClient);  // 立即认证
 }
 
 void loop(void) {

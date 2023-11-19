@@ -16,6 +16,7 @@ jobs:
       matrix:
         fqbn:
           - "esp8266:esp8266:nodemcu"
+          - "esp8266:esp8266:d1_mini"
 
     steps:
       - name: Checkout repository
