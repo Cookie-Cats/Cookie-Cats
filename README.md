@@ -71,16 +71,24 @@
 
 3. 如果我输入了错误的连接 WiFi 名和密码导致无法连接到路由器怎么办？
 
-​	请稍等约一分钟，**直到 LED 闪烁 5 次**，连接 CookieCats 的 WiFi，在浏览器中打开 [http://192.168.4.1](http://192.168.4.1)，即可重新配置。
+​	请稍等约一分钟，**直到 LED 闪烁 5 次**，连接 CookieCats 的 WiFi，在浏览器中打开 [http://192.168.4.1](http://192.168.4.1)，即可重新配置。如果无法打开管理界面，请参考[开发文档](#开发文档)中**如何强制刷机**的问题。
 
 4. 遇到无法解决的错误怎么办？
 
-* 如果你是电脑小白，请联系售卖此硬件的提供商。
-* 如果你是电脑高手，请打开一个 [Issue](https://github.com/Cookie-Cats/Cookie-Cats/issues) 反馈，帮助我们一起修复错误。
+   * 如果你是电脑小白，请联系售卖此硬件的提供商。
 
-5. 这个项目是开源的，是否意味着我可以自行购买开发版和使用此固件？
+   * 如果你是电脑高手，请打开一个 [Issue](https://github.com/Cookie-Cats/Cookie-Cats/issues) 反馈，帮助我们一起修复错误。
 
-   当然可以。请遵循 [许可证](#许可证)。
+
+5. 如果我觉得某处可以更好，或发现了错误？
+
+   欢迎投稿！请首先打开一个问题进行讨论，Fork 此存储库并提交拉取请求。您的代码会在 [GNU General Public License v3.0 的改进许可](https://github.com/Cookie-Cats/Cookie-Cats/blob/main/LICENSE)下发行。
+
+   如果你发现了一个安全问题，请[直接联系我](https://github.com/Metaphorme#contact-me)。
+
+6. 这个项目是开源的，是否意味着我可以自行购买开发版和使用此固件？
+
+​	当然可以，请遵循[许可证](#许可证)。
 
 ## 开发文档
 
@@ -133,8 +141,11 @@
    graph TD;
        内网DHCP服务器-->内网路由器;
    ```
-   
-   
+
+5. 如何强制刷机？
+
+   1. 从 [Amnesia](https://github.com/Cookie-Cats/Cookie-Cats/tree/main/Amnesia) 下载适当 Flash 大小的刷机固件，并按[提示](https://github.com/Cookie-Cats/Cookie-Cats/tree/main/Amnesia/README.md)操作；
+   2. 你可以在[这里](https://update.cookiecats.diazepam.cc/)下载最新的 CookieCats 固件，并按照相同的方法上传，即可强制刷机。
 
 ## 引用与鸣谢
 
@@ -146,10 +157,10 @@
 
 ## 许可证
 
-[Cookie-Cats](https://github.com/Cookie-Cats/Cookie-Cats) 在 GNU General Public License v3.0 的改进许可下发行。
+[Cookie-Cats](https://github.com/Cookie-Cats/Cookie-Cats) 在 [GNU General Public License v3.0 的改进许可](https://github.com/Cookie-Cats/Cookie-Cats/blob/main/LICENSE)下发行。
 
-改进许可指：你可以自由地在 GNU General Public License v3.0 许可下对本项目进行商业使用。每个 CookieCats 消费者的总付费（包括月租等方式）必须小于使用场景下运营商宽带最低包月价格。
+[改进许可](https://github.com/Cookie-Cats/Cookie-Cats/blob/main/LICENSE#L676)指：你可以自由地在 GNU General Public License v3.0 许可下对本项目进行商业使用。每个 CookieCats 消费者的总付费（包括月租等方式）必须小于使用场景下运营商宽带最低包月价格。
 
 ## 文档版本
 
-适用于CookieCats PIONEER_0.1_alpha_prerelease_010。
+适用于 CookieCats PIONEER_0.1_alpha_prerelease_010。
