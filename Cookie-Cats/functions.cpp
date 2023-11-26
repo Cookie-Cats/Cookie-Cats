@@ -344,6 +344,7 @@ void blink(int times) {
       last_change = current_time;                    // 更新上一次改变led状态的时间为当前时间
       if (LED_STATE == true) {                       // 如果led的状态是LOW，说明已经完成了一次闪烁，将闪烁次数加一
         count++;
+        yield();
       }
     }
   }

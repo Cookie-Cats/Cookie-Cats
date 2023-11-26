@@ -10,7 +10,7 @@
 #include "auth.h"
 #include "webpages.h"
 
-#define VERSION "PIONEER_0.1_alpha_prerelease_010"
+#define VERSION "PIONEER_0.1_alpha_prerelease_012"
 #define CONTRIBUTER "77, QiQi, and Cookie-Cats Org"
 #define SERIAL_BAUD 115200  // 串口波特率
 
@@ -331,8 +331,10 @@ void setup() {
   Serial.println(F("                   Cookie-Cats started.                   "));
   Serial.println("\n");
 
+  yield();
   blink(5);  // 闪烁 5 次，代表初始化成功
 
+  yield();
   if (startAuth) checkNetAndAuth(configuration, wifiClient);  // 立即认证
 }
 
