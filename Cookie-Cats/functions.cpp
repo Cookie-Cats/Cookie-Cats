@@ -320,6 +320,7 @@ void ICACHE_FLASH_ATTR readSecret(PracticalCrypto& secret) {
   } else {
     File file = LittleFS.open("/.secret", "w");
     String key = secret.generateKey();  // 生成密钥
+    yield();
     file.write(key.c_str());
     file.close();        // 写入密钥，关闭文件
     secret.setKey(key);  // 设置密钥

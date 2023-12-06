@@ -10,7 +10,7 @@
 #include "auth.h"
 #include "webpages.h"
 
-#define VERSION "PIONEER_0.1_alpha_prerelease_012"
+#define VERSION "PIONEER_0.1_alpha_prerelease_015"
 #define CONTRIBUTER "77, QiQi, and Cookie-Cats Org"
 #define SERIAL_BAUD 115200  // 串口波特率
 
@@ -127,6 +127,7 @@ void setup() {
       }
     }
     if (WiFi.status() != WL_CONNECTED) {
+      WiFi.disconnect(true);  // 停止连接 WiFi
       Serial.print(F("Cannot connect to "));
       Serial.print(configuration.WiFi_SSID);
       Serial.print(F(". Skip."));

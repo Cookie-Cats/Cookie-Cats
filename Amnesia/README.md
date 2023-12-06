@@ -14,7 +14,7 @@ Amnesia 用于擦除 ESP8266 的文件系统和 WiFi 凭据。
      * 打开 [http://www.metools.info/code/c92.html](http://www.metools.info/code/c92.html)；
      * 点击`选择文件`，上传固件；
      * 更改`哈希算法`为 SHA256；
-     * 点击`SHA计算`，将`文件SHA值`与 sha256sum 文件内容对比。
+     * 点击`SHA计算`，将`文件SHA值`与 [sha256sum](https://github.com/Cookie-Cats/Cookie-Cats/blob/main/Amnesia/sha256sum) 文件内容对比。
 
    * Linux
 
