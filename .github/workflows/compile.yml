@@ -34,7 +34,7 @@ jobs:
             - ./Cookie-Cats/
           libraries: |
             - name: ArduinoJson
-              version: 6.21.3
+              version: 6.21.4
             - name: TickTwo
               version: 4.4.0
             - name: PracticalCrypto

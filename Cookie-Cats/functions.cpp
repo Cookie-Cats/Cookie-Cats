@@ -16,7 +16,7 @@ String randomUA() {
 
 // 检测网络通断
 bool testNet(WiFiClient& wifiClient) {
-  Serial.println(F("Start testing the Internet"));
+  Serial.println(F("Start testing the Internet."));
   static const vector<String> testServer = {
     "http://connect.rom.miui.com/generate_204",                    // 小米
     "http://connectivitycheck.platform.hicloud.com/generate_204",  // 华为
@@ -43,10 +43,9 @@ bool testNet(WiFiClient& wifiClient) {
 
     httpClient.setTimeout(5000);  // 超时 5 秒
 
-    Serial.println(F("Sending get"));
+    Serial.println(F("Sending Get to test net server..."));
     int responseCode = httpClient.GET();  // 发送请求
 
-    Serial.println(F("Stop httpclient"));
     httpClient.end();  // 关闭连接
 
     if (responseCode == HTTP_CODE_NO_CONTENT) {  // 返回 204，连接成功
@@ -86,8 +85,6 @@ String ICACHE_FLASH_ATTR meow(String meow_url, WiFiClient& wifiClient) {
       responsePayload.trim();
       break;
     }
-
-    Serial.println(F("Stop httpclient.\n"));
     httpClient.end();  // 关闭连接
   }
   if (responsePayload == "0.0.0.0") {  // 如果返回 "0.0.0.0"，则认为获取失败。meow 也是这样定义的。
@@ -132,7 +129,7 @@ void ICACHE_FLASH_ATTR readConfigurationFromFile(File& file, Configuration& conf
       Serial.print(configuration.Cookie_Cat_SSID);
       Serial.println();
     } else {
-      Serial.println(F("Cookie_Cat_SSID not set."));
+      Serial.println(F("Cookie_Cat_SSID not set, use CookieCat instead."));
     }
   } else {
     Serial.println(F("No Cookie_Cat_SSID found in config.json, use CookieCat instead."));
@@ -227,7 +224,7 @@ void ICACHE_FLASH_ATTR readConfigurationFromFile(File& file, Configuration& conf
 
   // 学校
   if (config.containsKey("school")) {
-    vector<String> Schools = { "ChinaPharmaceuticalUniversityDormitory" };
+    vector<String> Schools = { "ChinaPharmaceuticalUniversityDormitory", "ChinaPharmaceuticalUniversityPublic" };
     const char* school = (const char*)config["school"];
 
     auto it = find(Schools.begin(), Schools.end(), school);  // 遍历支持的学校列表
@@ -241,33 +238,26 @@ void ICACHE_FLASH_ATTR readConfigurationFromFile(File& file, Configuration& conf
   }
 
   // IP 获取方式
-  if (config.containsKey("IP_Obtain_Method_Content")) {
-    const char* IP_Obtain_Method_Content = (const char*)config["IP_Obtain_Method_Content"];
-    if (IP_Obtain_Method_Content && strlen(IP_Obtain_Method_Content) > 0) {  // 如果 IP_Obtain_Method_Content 不为空
-      if (config.containsKey("IP_Obtain_Method")) {
-        const char* IP_Obtain_Method = (const char*)config["IP_Obtain_Method"];
-        vector<String> IP_Obtain_Methods = { "unnecessary", "meow", "manual" };
-        auto it = find(IP_Obtain_Methods.begin(), IP_Obtain_Methods.end(), IP_Obtain_Method);
-        if (it != IP_Obtain_Methods.end()) {  // 如果找到了方法
-          configuration.IP_Obtain_Method = IP_Obtain_Method;
-          configuration.IP_Obtain_Method_Content = IP_Obtain_Method_Content;
-          Serial.print(F("Set IP_Obtain_Method to:"));
-          Serial.print(IP_Obtain_Method);
-          Serial.println();
-          Serial.print(F("Set IP_Obtain_Method_Content to: "));
-          Serial.print(IP_Obtain_Method_Content);
-          Serial.println();
-        } else {
-          Serial.println(F("Unsupported IP_Obtain_Method. IP_Obtain_Method could only be one of meow, manual, unnecessary. Skip."));
-        }
-      } else {
-        Serial.println(F("No IP_Obtain_Method found. Skip."));
-      }
-    } else {
-      Serial.println(F("IP_Obtain_Method_Content is None. Skip."));
+  if (config.containsKey("IP_Obtain_Method")) {
+    JsonObject IP_Obtain_Method = config["IP_Obtain_Method"];
+    if (IP_Obtain_Method.containsKey("meow")) {  // 采用 meow
+      const char* url = (const char*)IP_Obtain_Method["meow"];
+      configuration.IP_Obtain_Method = { "meow", url };
+      Serial.print(F("Set meow URL: "));
+      Serial.print(url);
+      Serial.println();
+    } else if (IP_Obtain_Method.containsKey("manual")) {  // 采用 manual
+      const char* ip = (const char*)IP_Obtain_Method["manual"];
+      configuration.IP_Obtain_Method = { "manual", ip };
+      Serial.print(F("Get manual input IP: "));
+      Serial.print(ip);
+      Serial.println();
+    } else if (IP_Obtain_Method.containsKey("unnecessary")) {         // 采用 unnecessary
+      configuration.IP_Obtain_Method = { "unnecessary", "0.0.0.0" };  // 默认 IP 0.0.0.0
+      Serial.println(F("Set IP_Obtain_Method into unnecessary."));
     }
   } else {
-    Serial.println(F("No IP_Obtain_Method_Content found. Skip."));
+    Serial.println(F("IP_Obtain_Method not set or wrong set. IP_Obtain_Method could only be one of meow, manual, unnecessary."));
   }
 
   // 是否允许 OTA 更新

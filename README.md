@@ -36,14 +36,28 @@
 
   1. 将[路由器设置为 DHCP 客户端模式](https://lic.cpu.edu.cn/ee/c5/c7550a192197/page.htm)；
   2. 绑定[运营商宽带与统一身份认证](https://lic.cpu.edu.cn/ee/c6/c7550a192198/page.htm)；
-  3. 阅读 [使用指南](#使用指南)，打开配置界面（第三步）；
+  3. 阅读 [使用指南](#使用指南)，打开配置界面（第 2、3 步）；
   4. 按图填写配置信息：
 
   <img src="imgs/cpu_d1.png" width=80% height=80% />
 
-  5. CookieCats 将自动重启。如果 LED 灯在通电后 50 秒内快速闪烁 5 次，则连接 WiFi 成功；否则请见[常见问题](#常见问题)的第三个问题；
-  6. 如果 LED 连续闪烁 2 次，则为检测到网络断开、自动连接；如果 LED 闪烁 1 次，则为网络连接正常。CookieCats 每隔 20 秒会自动检测连接状态；
+  5. Cookie-Cats 将自动重启。如果 LED 灯在通电后 50 秒内快速闪烁 5 次，则连接 WiFi 成功；否则请见[常见问题](#常见问题)的第三个问题；
+  6. 如果 LED 连续闪烁 2 次，则为检测到网络断开、自动连接；如果 LED 闪烁 1 次，则为网络连接正常。Cookie-Cats 每隔 20 秒会自动检测连接状态；
   7. 按照 [使用指南](#使用指南) 第 5 步操作。
+
+* 中国药科大学公共网
+
+  ⚠️ 中国药科大学公共网仅对实验室有线网、CPU 无线客户端等可以获取到 `10.7.x.x` 网段 IP 的设备开放。本选项应用场景包括但不限于为实验室等需要保持网络连接的路由器提供 24 小时联网保障。
+
+  1. 将路由器设置为 DHCP 客户端模式
+
+  2. 阅读 [使用指南](#使用指南)，打开配置界面（第 2、3 步）；
+
+  3. 按图填写配置信息：
+
+     <img src="imgs/cpu_p1.png" width=80% height=80% />
+
+     4. 如果 LED 连续闪烁 2 次，则为检测到网络断开、自动连接；如果 LED 闪烁 1 次，则为网络连接正常。Cookie-Cats 每隔 20 秒会自动检测连接状态。
 
 ## 常见问题
 
@@ -51,27 +65,29 @@
 
    * 如果我**可以**连接 Cookie-Cats 的 WiFi
 
-     连接 Cookie-Cats 的 WiFi。在地址栏输入 [http://192.168.4.1](http://192.168.4.1)，打开配置界面，点击“清除配置”即可。
+     连接 Cookie-Cats 的 WiFi。在地址栏输入 [http://192.168.4.1/config/rmconfig](http://192.168.4.1/config/rmconfig)，点击回车，Cookie-Cats 将自动重启并清空配置；
 
    * 如果我**无法**连接 Cookie-Cats 的 WiFi（如忘记了密码）
 
-     连接 Cookie-Cats 设定的路由器 WiFi，打开路由管理界面，在 DHCP 客户端中找到设备名为 Cookie-Cats 的设备。获得其 IP，在浏览器输入 `http://IP地址` 即可。
+     连接 Cookie-Cats 设定的路由器 WiFi，打开路由管理界面，在 DHCP 客户端中找到设备名为 Cookie-Cats 的设备。获得其 IP，在浏览器输入 `http://IP地址/config/rmconfig` ，点击回车，Cookie-Cats 将自动重启并清空配置；
+     
+   * 硬重置，请[阅读](Amnesia/README.md)。
 
 
-2. 如何判断 CookieCats 已正常连接 WiFi？
+2. 如何判断 Cookie-Cats 已正常连接 WiFi？
 
-   将 CookieCats 断电后重新连接电源。如果 LED 灯在通电后 50 秒内快速闪烁 5 次，则连接 WiFi 成功。
+   将 Cookie-Cats 断电后重新连接电源。如果 LED 灯在通电后 50 秒内快速闪烁 5 次，则连接 WiFi 成功。
 
    如果不能连接，请确认：
 
    * **你输入了正确的 WiFi 名和密码**；
-   * 如果你的 WiFi 同时支持 2.4 GHz 和 5GHz，请确保 CookieCats 在尝试连接 2.4 GHz 的 WiFi（如果你的路由器 WiFi 名为 TP_LINK_K7DS 和 TP_LINK_5G_K7DS，请连接 TP_LINK_K7DS）。
-   * CookieCats 在 WiFi 信号范围内；
-   * 如果你的 WiFi 设置了 MAC 白名单，请将 CookieCats 网卡 MAC 地址加入白名单中；
+   * 如果你的 WiFi 同时支持 2.4 GHz 和 5GHz，请确保 Cookie-Cats 在尝试连接 2.4 GHz 的 WiFi（如果你的路由器 WiFi 名为 TP_LINK_K7DS 和 TP_LINK_5G_K7DS，请连接 TP_LINK_K7DS）。
+   * Cookie-Cats 在 WiFi 信号范围内；
+   * 如果你的 WiFi 设置了 MAC 白名单，请将 Cookie-Cats 网卡 MAC 地址加入白名单中；
 
 3. 如果我输入了错误的连接 WiFi 名和密码导致无法连接到路由器怎么办？
 
-​	请稍等约一分钟，**直到 LED 闪烁 5 次**，连接 CookieCats 的 WiFi，在浏览器中打开 [http://192.168.4.1](http://192.168.4.1)，即可重新配置。如果无法打开管理界面，请参考[开发文档](#开发文档)中**如何强制刷机**的问题。
+​	请稍等约一分钟，**直到 LED 闪烁 5 次**，连接 Cookie-Cats 的 WiFi，在浏览器中打开 [http://192.168.4.1](http://192.168.4.1)，即可重新配置。如果无法打开管理界面，请参考[开发文档](#开发文档)中**如何强制刷机**的问题。
 
 4. 遇到无法解决的错误怎么办？
 
@@ -82,7 +98,7 @@
 
 5. 如果我觉得某处可以更好，或发现了错误？
 
-   欢迎投稿！请首先打开一个问题进行讨论，Fork 此存储库并提交拉取请求。您的代码会在 [GNU General Public License v3.0 的改进许可](https://github.com/Cookie-Cats/Cookie-Cats/blob/main/LICENSE)下发行。
+   欢迎投稿！请首先打开一个问题进行讨论，Fork 此存储库并提交拉取请求。您的代码会在 [GNU General Public License v3.0 的改进许可](https://github.com/Cookie-Cats/Cookie-Cats/blob/main/LICENSE) 下发行。
 
    如果你发现了一个安全问题，请[直接联系我](https://github.com/Metaphorme#contact-me)。
 
@@ -133,21 +149,28 @@
 
      以下开发版经过测试可用：LOLIN D1 mini、NodeMCU。
 
-4. 我校的认证系统需要提供路由器的 IP 地址，如何获取？（未写完）
+4. 认证系统需要提供路由器的 IP 地址，如何获取？
 
-   请看如下网络拓扑图：
+   * 通过认证系统 API 获取
 
-   ```mermaid
-   graph TD;
-       内网DHCP服务器-->内网路由器;
-   ```
+     * Dr.COM
+
+       当使用需要 IP 的认证系统且选择“无需获取”时，将通过 Dr.COM API 获取 IP。实现方法请见 [auth.cpp](Cookie-Cats/auth.cpp)。
+
+   * 使用 meow
+
+     <img src="imgs/meow_principle.png" width=80% height=80% />
+
+   * 手动输入
 
 5. 如何强制刷机？
 
    1. 从 [Amnesia](https://github.com/Cookie-Cats/Cookie-Cats/tree/main/Amnesia) 下载适当 Flash 大小的刷机固件，并按[提示](https://github.com/Cookie-Cats/Cookie-Cats/tree/main/Amnesia/README.md)操作；
-   2. 你可以在[这里](https://update.cookiecats.diazepam.cc/)下载最新的 CookieCats 固件，并按照相同的方法上传，即可强制刷机。
+   2. 你可以在[这里](https://update.cookiecats.diazepam.cc/)下载最新的 Cookie-Cats 固件，并按照相同的方法上传，即可强制刷机。
 
 ## 引用与鸣谢
+
+### 本项目引用以下项目的代码
 
 * [ESP8266 Arduino Core](https://github.com/esp8266/Arduino)，基于 GNU Lesser General Public License v2.1 许可下分发；
 * [ArduinoJson](https://arduinojson.org)，基于 MIT License 许可下分发；
@@ -155,12 +178,23 @@
 * [LittleFS](https://github.com/littlefs-project/littlefs)，基于 BSD 3-clause license 许可下分发；
 * [PracticalCrypto](https://github.com/gutierrezps/PracticalCrypto)，基于 GNU Lesser General Public License v2.1 许可下分发。
 
+### 本项目的实现参考以下代码或文献
+
+* [drcoms/drcom-generic](https://github.com/drcoms/drcom-generic)
+* [lucienshawls/CPU_Network_Auth](https://github.com/lucienshawls/CPU_Network_Auth)
+* [SpacehuhnTech/esp8266_deauther](https://github.com/SpacehuhnTech/esp8266_deauther)
+* [SpacehuhnTech/espwebtool](https://github.com/spacehuhntech/espwebtool)
+
 ## 许可证
 
 [Cookie-Cats](https://github.com/Cookie-Cats/Cookie-Cats) 在 [GNU General Public License v3.0 的改进许可](https://github.com/Cookie-Cats/Cookie-Cats/blob/main/LICENSE)下发行。
 
-[改进许可](https://github.com/Cookie-Cats/Cookie-Cats/blob/main/LICENSE#L676)指：你可以自由地在 GNU General Public License v3.0 许可下对本项目进行商业使用。每个 CookieCats 消费者的总付费（包括月租等方式）必须小于使用场景下运营商宽带最低包月价格。
+[改进许可](https://github.com/Cookie-Cats/Cookie-Cats/blob/main/LICENSE#L676)指：你可以自由地在 GNU General Public License v3.0 许可下对本项目进行商业使用。每个 - 消费者的总付费（包括月租等方式）必须小于使用场景下运营商宽带最低包月价格。
 
 ## 文档版本
 
-适用于 CookieCats PIONEER_0.1_alpha_prerelease_010。
+适用于 CookieCats PIONEER_0.1_alpha_prerelease_016。
+
+## 固件下载
+
+你可以在 [https://update.cookiecats.diazepam.cc](https://update.cookiecats.diazepam.cc) 下载最新的 Cookie-Cats 固件。

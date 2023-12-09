@@ -10,10 +10,11 @@
 #include "auth.h"
 #include "webpages.h"
 
-#define VERSION "PIONEER_0.1_alpha_prerelease_015"
+#define VERSION "PIONEER_0.1_alpha_prerelease_016"
 #define CONTRIBUTER "77, QiQi, and Cookie-Cats Org"
 #define SERIAL_BAUD 115200  // 串口波特率
 
+// 调试：发布前请确认次选项为 true
 #define ALLOW_OTA_UPDATE true  // 允许 OTA 升级
 
 using namespace std;
@@ -160,10 +161,10 @@ void setup() {
   // TODO：目前仅支持 meow 和 manual，之后将增加其他方法
   httpserver.on("/status/ip", HTTP_GET, []() {
     String ip;
-    if (configuration.IP_Obtain_Method == "meow") {
-      ip = meow(configuration.IP_Obtain_Method_Content, wifiClient);
-    } else if (configuration.IP_Obtain_Method == "manual") {
-      ip = configuration.IP_Obtain_Method_Content;
+    if (configuration.IP_Obtain_Method.first == "meow") {
+      ip = meow(configuration.IP_Obtain_Method.second, wifiClient);
+    } else if (configuration.IP_Obtain_Method.first == "manual") {
+      ip = configuration.IP_Obtain_Method.second;
     } else {
       ip = "No IP method to found, please config IP method in config.json";
     }
@@ -196,7 +197,7 @@ void setup() {
   // 如果 JSON 格式合法，将把接收到的 JSON 覆盖保存到 config.json
   // 如果保存成功，返回状态码为 200，类型：application/json 内容：{"success":"config.json saved."}
   // 如果保存失败，则返回状态码 500，类型：application/json 内容：{"error":"Failed to save."}
-  // 测试命令：curl -X POST -H "Content-Type: application/json" -d '{"Cookie_Cat_SSID": "CookieCat","Cookie_Cat_PASSWORD": "cookiecat","WiFi_SSID": "OpenWrt","WiFi_PASSWORD": "okgogogo","username": "","password": "","carrier": "","school": "","IP_Obtain_Method": "meow", "IP_Obtain_Method_Content": "http://192.168.10.151:8080","allowOTA": "true"}' http://192.168.10.181/config/save
+  // 测试命令：curl -X POST -H "Content-Type: application/json" -d '{"Cookie_Cat_SSID":"CookieCat","Cookie_Cat_PASSWORD":"cookiecat","WiFi_SSID":"","WiFi_PASSWORD":"","username":"","password":"","carrier":"","school":"","IP_Obtain_Method":{"meow":"http://192.168.10.151:8080"},"allowOTA":"true"}' http://192.168.4.1/config/save
   httpserver.on("/config/save", HTTP_POST, [] {
     Serial.println(F("Receiving config.json..."));
     DynamicJsonDocument doc(1024);                                               // 创建一个 JSON 文档对象，用于存储接收到的 JSON 数据

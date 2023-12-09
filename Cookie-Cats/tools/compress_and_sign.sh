@@ -12,6 +12,6 @@ WORK_PATH=../build/$FQBN
 
 cd $WORK_PATH
 mv Cookie-Cats.ino.bin CookieCats-$VERSION.bin
-gzip -9 -c CookieCats-$VERSION.bin > CookieCats-$VERSION.bin.gz
-signing.py --mode sign --privatekey ../../keys/private.pem --bin CookieCats-$VERSION.bin.gz --out CookieCats-$VERSION.bin.gz.signed
+# gzip -9 -c CookieCats-$VERSION.bin > CookieCats-$VERSION.bin.gz
+signing.py --mode sign --privatekey ../../keys/private.pem --bin CookieCats-$VERSION.bin --out CookieCats-$VERSION.bin.signed
 
