@@ -73,41 +73,35 @@ String ICACHE_FLASH_ATTR getDrcomIp(String apiURL, WiFiClient &wifiClient) {
   return IP;
 }
 
-// 中国药科大学公共网
-bool ICACHE_FLASH_ATTR authChinaPharmaceuticalUniversityPublic(Configuration &config, WiFiClient &wifiClient) {
-  // 获取 IP
-  String IP;
-  if (config.IP_Obtain_Method.first == "unnecessary") {  // 如果设置为 unnecessary，则从 Drcom 的 API 获取
-    String apiURL = "http://192.168.199.21/drcom/chkstatus?callback=dr1002";
-    IP = getDrcomIp(apiURL, wifiClient);
-  } else {
-    IP = config.IP_Obtain_Method.second;
+// 中国药科大学
+bool ICACHE_FLASH_ATTR authCPU(Configuration &config, WiFiClient &wifiClient) {
+  if (config.carrier == "SchoolNetwork") {                 // 中国药科大学校园网
+    String IP;                                             // 获取 IP
+    if (config.IP_Obtain_Method.first == "unnecessary") {  // 如果设置为 unnecessary，则从 Drcom 的 API 获取
+      String apiURL = "http://192.168.199.21/drcom/chkstatus?callback=dr1002";
+      IP = getDrcomIp(apiURL, wifiClient);
+    } else {
+      IP = config.IP_Obtain_Method.second;
+    }
+    // 构造认证 URL
+    String authURL = "http://192.168.199.21:801/eportal/?c=Portal&a=login&callback=dr1004&login_method=1&user_account=,0," + config.username + "&user_password=" + config.password + "&wlan_user_ip=" + IP + "&wlan_user_mac=000000000000&jsVersion=3.3.3&v=10379";
+    return drcomWebAuth(authURL, wifiClient);
+  } else {                                                      // 中国药科大学宿舍网
+    String carrier;                                             // 转换运营商到认证格式
+    if (config.carrier == "ChinaTelecom") carrier = "telecom";  // 已在读取 config 时做过判断，carrier 只能为 "ChinaTelecom", "ChinaUnicom", "ChinaMobile", "SchoolNetwork", ""
+    else if (config.carrier == "ChinaUnicom") carrier = "unicom";
+    else if (config.carrier == "ChinaMobile") carrier = "cmcc";
+    String authURL = "http://172.17.253.3/drcom/login?callback=dr1003&DDDDD=" + config.username + "%40" + carrier + "&upass=" + config.password + "&0MKKey=123456&R1=0&R2=&R3=0&R6=1&para=00&v6ip=&terminal_type=2&lang=zh-cn&jsVersion=4.1.3&v=5336&lang=zh";
+    return drcomWebAuth(authURL, wifiClient);
   }
-  // 构造认证 URL
-  String authURL = "http://192.168.199.21:801/eportal/?c=Portal&a=login&callback=dr1004&login_method=1&user_account=,0," + config.username + "&user_password=" + config.password + "&wlan_user_ip=" + IP + "&wlan_user_mac=000000000000&jsVersion=3.3.3&v=10379";
-  return drcomWebAuth(authURL, wifiClient);
-}
-
-// 中国药科大学宿舍网
-bool ICACHE_FLASH_ATTR authChinaPharmaceuticalUniversityDormitory(Configuration &config, WiFiClient &wifiClient) {
-  String carrier;                                             // 转换运营商到认证格式
-  if (config.carrier == "ChinaTelecom") carrier = "telecom";  // 已在读取 config 时做过判断，carrier 只能为 "ChinaTelecom", "ChinaUnicom", "ChinaMobile", ""
-  else if (config.carrier == "ChinaUnicom") carrier = "unicom";
-  else if (config.carrier == "ChinaMobile") carrier = "cmcc";
-
-  // 构造认证 URL
-  String authURL = "http://172.17.253.3/drcom/login?callback=dr1003&DDDDD=" + config.username + "%40" + carrier + "&upass=" + config.password + "&0MKKey=123456&R1=0&R2=&R3=0&R6=1&para=00&v6ip=&terminal_type=2&lang=zh-cn&jsVersion=4.1.3&v=5336&lang=zh";
-  return drcomWebAuth(authURL, wifiClient);
 }
 
 // 自动认证
 // 警告：使用前需要判断 school、username、password 是否为空
 bool auth(Configuration &config, WiFiClient &wifiClient) {
   Serial.println(F("Starting authoriation..."));
-  if (config.school == "ChinaPharmaceuticalUniversityDormitory") {  // 中国药科大学宿舍网
-    return authChinaPharmaceuticalUniversityDormitory(config, wifiClient);
-  } else if (config.school == "ChinaPharmaceuticalUniversityPublic") {  // 中国药科大学公共网
-    return authChinaPharmaceuticalUniversityPublic(config, wifiClient);
+  if (config.school == "CPU") {  // 中国药科大学
+    return authCPU(config, wifiClient);
   } else {
     return false;
   }

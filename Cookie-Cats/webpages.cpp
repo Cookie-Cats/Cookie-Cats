@@ -250,14 +250,14 @@ String ICACHE_FLASH_ATTR webPages(String &page) {
                     <div class="form-wrapper">
                         <select class="custom-select" name="school" id="school">
                             <option value="" selected>选择学校</option>
-                            <option value="ChinaPharmaceuticalUniversityDormitory">中国药科大学宿舍网</option>
-                            <option value="ChinaPharmaceuticalUniversityPublic">中国药科大学公共网</option>
+                            <option value="CPU">中国药科大学</option>
                         </select>
                         <select class="custom-select" name="carrier" id="carrier">
                             <option value="" selected>选择供应商</option>
                             <option value="ChinaMobile">中国移动</option>
                             <option value="ChinaUnicom">中国联通</option>
                             <option value="ChinaTelecom">中国电信</option>
+                            <option value="SchoolNetwork">校园网</option>
                         </select>
                     </div>
                     <div class="form-wrapper">

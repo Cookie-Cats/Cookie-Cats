@@ -216,14 +216,14 @@ void ICACHE_FLASH_ATTR readConfigurationFromFile(File& file, Configuration& conf
 
   // 运营商
   if (config.containsKey("carrier")) {
-    vector<String> Carriers = { "ChinaTelecom", "ChinaUnicom", "ChinaMobile" };
+    vector<String> Carriers = { "ChinaTelecom", "ChinaUnicom", "ChinaMobile", "SchoolNetwork" };
     const char* carrier = (const char*)config["carrier"];
 
     auto it = find(Carriers.begin(), Carriers.end(), carrier);  // 遍历运营商列表
     if (it != Carriers.end()) {                                 // 如果找到了元素
       configuration.carrier = carrier;
     } else {  // 如果没有找到元素
-      Serial.println(F("Carrier not set or wrong set. Carrier could only be one of ChinaTelecom, ChinaUnicom, ChinaMobile."));
+      Serial.println(F("Carrier not set or wrong set. Carrier could only be one of ChinaTelecom, ChinaUnicom, ChinaMobile, SchoolNetwork."));
     }
   } else {
     Serial.println(F("No carrier found in config.json"));
@@ -231,11 +231,31 @@ void ICACHE_FLASH_ATTR readConfigurationFromFile(File& file, Configuration& conf
 
   // 学校
   if (config.containsKey("school")) {
-    vector<String> Schools = { "ChinaPharmaceuticalUniversityDormitory", "ChinaPharmaceuticalUniversityPublic" };
-    const char* school = (const char*)config["school"];
+    vector<String> Schools = { "CPU" };
+    String school = (const char*)config["school"];
+
+    // --------------------------------------------------------------------------------------------------------------------------------
+    /*
+    兼容代码：
+    PIONEER_0.1_alpha_prerelease_016 及以前版本配置文件此选项包含 ChinaPharmaceuticalUniversityDormitory 或 ChinaPharmaceuticalUniversityPublic
+    之后版本这两个选项均指向 CPU
+    此兼容代码可能在 PIONEER_0.1_alpha 版本去除
+    */
+    if ((school == "ChinaPharmaceuticalUniversityDormitory") || (school == "ChinaPharmaceuticalUniversityPublic")) {
+      Serial.println(F("Old config found. Automatic conversion to the new format."));
+      school = "CPU";
+      config["school"] = "CPU";
+      File configFile = LittleFS.open("/config.json", "w");
+      serializeJson(config, configFile);  // 写入新配置
+      configFile.close();
+    }
+    // --------------------------------------------------------------------------------------------------------------------------------
 
     auto it = find(Schools.begin(), Schools.end(), school);  // 遍历支持的学校列表
     if (it != Schools.end()) {                               // 如果找到了元素
+      Serial.print(F("Set school into: "));
+      Serial.print(school);
+      Serial.println();
       configuration.school = school;
     } else {  // 如果没有找到元素
       Serial.println(F("School not set or unsupported."));
