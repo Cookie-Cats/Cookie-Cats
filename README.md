@@ -1,6 +1,6 @@
 # Cookie-Cats
 
-一个基于 ESP8266 开发的简约智能的校园网自动化认证工具。
+Cookie-Cats（或 CookieCats）是一个基于 ESP8266 开发的简约智能的校园网自动化认证工具。
 
 <img src="imgs/Cookie-Cats.jpg" width=40% height=40% />
 
@@ -39,7 +39,9 @@
 | 🚧    | 正在实现｜修复错误 |
 | 🤝    | 需要帮助           |
 
-### 中国药科大学宿舍网
+### 中国药科大学
+
+#### 宿舍网
 
 | 类型 | 状态 |
 | ---- | ---- |
@@ -59,12 +61,13 @@
 6. 如果 LED 连续闪烁 2 次，则为检测到网络断开、自动连接；如果 LED 闪烁 1 次，则为网络连接正常。Cookie-Cats 每隔 20 秒会自动检测连接状态；
 7. 按照 [使用指南](#使用指南) 第 5 步操作。
 
-### 中国药科大学校园网
+#### 校园网
 
-| 类型 | 状态 |
-| ---- | ---- |
-| 实现 | ✅    |
-| 验证 | ✅    |
+| 类型 | 状态                                                     |
+| ---- | -------------------------------------------------------- |
+| 实现 | ✅                                                        |
+| 验证 | ✅                                                        |
+| 备注 | 如果 IP 获取方式选择无需获取，将使用 DrCOM API 获取 IP。 |
 
 ⚠️ 中国药科大学校园网仅对实验室有线网、CPU 无线客户端等可以获取到 `10.7.x.x` 网段 IP 的设备开放。本选项应用场景包括但不限于为实验室等需要保持网络连接的路由器提供 24 小时联网保障。
 
@@ -212,6 +215,21 @@
    1. 从 [Amnesia](https://github.com/Cookie-Cats/Cookie-Cats/tree/main/Amnesia) 下载适当 Flash 大小的刷机固件，并按[提示](https://github.com/Cookie-Cats/Cookie-Cats/tree/main/Amnesia/README.md)操作；
    2. 你可以在[这里](https://update.cookiecats.diazepam.cc/)下载最新的 Cookie-Cats 固件，并按照相同的方法上传，即可强制刷机。
 
+6. API
+
+   | 地址                  | 请求类型 | 返回类型         | 状态码｜返回内容                                             | 备注                                                         |
+   | --------------------- | -------- | ---------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+   | /status/network       | GET      | text/plain       | 200｜"true"<br />200 \| "false"                              | 返回网络状态：<br />true 为可联网；false 为不可联网。        |
+   | /status/ip            | GET      | text/plain       | 200 \| IP                                                    | 当 config.IP_Obtain_Method 为 meow 时返回 IP；<br />当 config.IP_Obtain_Method 为 manual 时返回手动输入的 IP；<br />当 config.IP_Obtain_Method 为 ununcessary 时返回 0.0.0.0。 |
+   | /device/restart       | GET      | text/plain       | 200 \| "Restart now."                                        | Cookie-Cats 将立即重启。                                     |
+   | /config/get           | GET      | application/json | 200 \| config<br />500 \| {\"error\":\"No config.json Found.\"} | 返回配置文件内容。                                           |
+   | /config/save          | POST     | application/json | 200 \| {"success":"config.json saved."}<br />500 \| {"error":"Failed to save."}<br />500｜{\"error\":\"Invalid JSON format.\"} | 上传并保存配置文件；<br />如果 JSON 格式合法，将把接收到的 JSON 覆盖保存到 config.json。<br />测试命令：curl -X POST -H "Content-Type: application/json" -d '{"Cookie_Cat_SSID":"CookieCat","Cookie_Cat_PASSWORD":"cookiecat","WiFi_SSID":"","WiFi_PASSWORD":"","username":"","password":"","carrier":"","school":"","IP_Obtain_Method":{"meow":"http://192.168.10.151:8080"},"allowOTA":"true"}' http://192.168.4.1/config/save |
+   | /config/rmconfig      | GET      | text/plain       | 200 \| "Removed config.json"<br />500 \| "No config.json found." | 清除配置并重启。                                             |
+   | /firmware/version     | GET      | text/plain       | 200 \| VERSION                                               | 返回固件版本和作者信息。                                     |
+   | /firmware/allowupdate | GET      | text/plain       | 200 \| "true"<br />200 \| "false"                            | 返回是否允许自动更新。                                       |
+   | /firmware/update      | GET      | text/plain       | 200 \| "Ok."                                                 | 强制更新，忽略固件和用户设置。<br />返回值不能表示是否更新。 |
+   | /auth/status          | GET      | text/plain       | 200 \| "true"<br />200 \| "false"                            | 返回认证程序状态；<br />true 为认证程序启动；false 为认证程序关闭。 |
+
 ## 引用与鸣谢
 
 ### 本项目引用以下项目的代码：
@@ -238,7 +256,7 @@
 
 ## 文档版本
 
-适用于 CookieCats PIONEER_0.1_alpha_prerelease_016。
+适用于 CookieCats PIONEER_0.1_alpha_prerelease_017。
 
 ## 固件下载
 

@@ -158,6 +158,7 @@ void setup() {
 
   // 获取IP
   // API，通过访问 "/status/ip" 得到
+  // 当 config.IP_Obtain_Method 为 ununcessary 时返回 0.0.0.0
   // TODO：目前仅支持 meow 和 manual，之后将增加其他方法
   httpserver.on("/status/ip", HTTP_GET, []() {
     String ip;
@@ -186,6 +187,7 @@ void setup() {
       Serial.println(F("Sending config.json"));
       File jsonText = LittleFS.open("/config.json", "r");
       httpserver.send(200, "application/json", jsonText);
+      jsonText.close();
     } else {
       Serial.println(F("No config.json Found."));
       httpserver.send(500, "application/json", "{\"error\":\"No config.json Found.\"}");
@@ -221,6 +223,7 @@ void setup() {
         Serial.println(F("Failed to save config.json"));
         httpserver.send(500, "application/json", "{\"error\":\"Failed to save.\"}");
       }
+      jsonConfig.close();
     } else {
       // 如果解析失败，说明 JSON 格式不合法
       // 返回失败信息
@@ -266,11 +269,11 @@ void setup() {
 
   // 强制更新固件
   // API，访问 "/firmware/update" 将强制更新，忽略固件和用户设置
-  // 警告：返回值无实际意义。
+  // 警告：返回值不能表示是否更新。
   httpserver.on("/firmware/update", HTTP_GET, []() {
+    httpserver.send(200, "text/plain", "Ok.");
     Serial.println(F("Updating firmware..."));
     otaUpdate(wifiClient, UPDATE_URL, VERSION);
-    httpserver.send(200, "text/plain", "Ok.");
   });
 
   // 返回认证程序是否启动
