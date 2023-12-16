@@ -12,8 +12,12 @@
 // 获得随机 UA
 String randomUA();
 
+// 发送 http 请求
+// send_type: GET/POST
+HttpResponse sendHttpRequest(String url, WiFiClient &wifiClient, String send_type = "GET", String post_payload = "", String user_agent = randomUA(), int timeout = 5000);
+
 // 检测网络通断
-bool testNet(WiFiClient &wifiClient);
+bool ICACHE_FLASH_ATTR testNet(WiFiClient &wifiClient);
 
 // 获取当前 IP
 // 方法1：meow
@@ -21,7 +25,7 @@ bool testNet(WiFiClient &wifiClient);
 String ICACHE_FLASH_ATTR meow(String meow_url, WiFiClient &wifiClient);
 
 // 用于 http 服务器，获取文件类型
-String httpGetContentType(String filename);
+String ICACHE_FLASH_ATTR httpGetContentType(String filename);
 
 // 读取配置文件
 void ICACHE_FLASH_ATTR readConfigurationFromFile(File &file, Configuration &configuration, PracticalCrypto &secret);

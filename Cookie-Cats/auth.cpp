@@ -8,21 +8,15 @@ using namespace std;
 
 // drcom 网页认证
 bool ICACHE_FLASH_ATTR drcomWebAuth(String authURL, WiFiClient &wifiClient) {
-  HTTPClient httpClient;                  // 开启 http 客户端
-  httpClient.begin(wifiClient, authURL);  // 构建请求
-  httpClient.setUserAgent(randomUA());    // 设置 UA
-  httpClient.setTimeout(5000);            // 超时 5 秒
-
   Serial.println(F("Sending auth message..."));
-  int responseCode = httpClient.GET();  // 发送请求
+  HttpResponse response;
+  response = sendHttpRequest(authURL, wifiClient);  // 发送 HTTP 请求
 
   bool authSuccess = false;
-  if (responseCode == HTTP_CODE_OK) {  // 返回 200，连接成功
+  if (response.status_code == HTTP_CODE_OK) {  // 返回 200，连接成功
     Serial.println(F("Connected to auth server."));
     // 如果返回值包含："result":1 则认为认证成功
-    String responsePayload;
-    responsePayload = httpClient.getString();
-    int index = responsePayload.indexOf("\"result\":1");
+    int index = response.content.indexOf("\"result\":1");
     if (index != -1) {  // 认证成功
       Serial.println(F("Authentication success."));
       authSuccess = true;
@@ -32,7 +26,6 @@ bool ICACHE_FLASH_ATTR drcomWebAuth(String authURL, WiFiClient &wifiClient) {
   } else {
     Serial.println(F("Failed to connect to auth server."));
   }
-  httpClient.end();  // 关闭连接
   return authSuccess;
 }
 
@@ -50,25 +43,19 @@ bool ICACHE_FLASH_ATTR drcomWebAuth(String authURL, WiFiClient &wifiClient) {
 返回值中 "ss5" 的项为 IP
 */
 String ICACHE_FLASH_ATTR getDrcomIp(String apiURL, WiFiClient &wifiClient) {
-  HTTPClient httpClient;                 // 开启 http 客户端
-  httpClient.begin(wifiClient, apiURL);  // 构建请求
-  httpClient.setUserAgent(randomUA());   // 设置 UA
-  httpClient.setTimeout(5000);           // 超时 5 秒
-
   Serial.println(F("Try to get IP by Drcom API..."));
-  int responseCode = httpClient.GET();  // 发送请求
+  HttpResponse response;
+  response = sendHttpRequest(apiURL, wifiClient);  // 发送 HTTP 请求
 
   String IP;
-  if (responseCode == HTTP_CODE_OK) {  // 返回 200，连接成功
+  if (response.status_code == HTTP_CODE_OK) {  // 返回 200，连接成功
     Serial.println(F("Connected to Drcom status API."));
     // 寻找本机 IP
-    String responsePayload;
-    responsePayload = httpClient.getString();
-    responsePayload.trim();                                // 删除前后空格
-    responsePayload.remove(0, 7);                          // 删除 “dr1002(”
-    responsePayload.remove(responsePayload.length() - 1);  // 删除末尾括号
-    DynamicJsonDocument responseJson(1024);                // 创建 Json 对象并解码
-    DeserializationError error = deserializeJson(responseJson, responsePayload);
+    response.content.trim();                                 // 删除前后空格
+    response.content.remove(0, 7);                           // 删除 “dr1002(”
+    response.content.remove(response.content.length() - 1);  // 删除末尾括号
+    DynamicJsonDocument responseJson(1024);                  // 创建 Json 对象并解码
+    DeserializationError error = deserializeJson(responseJson, response.content);
     IP = responseJson["ss5"].as<String>();
     if (error || (IP == "")) {  // 如果解析出错
       Serial.println(F("Cannot get local IP."));
@@ -80,7 +67,6 @@ String ICACHE_FLASH_ATTR getDrcomIp(String apiURL, WiFiClient &wifiClient) {
   } else {
     Serial.println(F("Failed to connect to Drcom status API."));
   }
-  httpClient.end();  // 关闭连接
   if (IP == "") {
     IP = "0.0.0.0";  // 0.0.0.0 被定义为获取失败
   }

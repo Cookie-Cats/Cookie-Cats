@@ -33,4 +33,12 @@ public:
   bool allowOTA;
 };
 
+class HttpResponse {
+public:
+  // 状态码
+  int status_code;
+  // 响应内容
+  String content;
+};
+
 #endif  // STRUCTURES_H

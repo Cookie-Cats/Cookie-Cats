@@ -14,9 +14,38 @@ String randomUA() {
   return UAs[random(0, UAs.size() - 1)];
 }
 
+// 发送 http 请求
+// send_type: GET/POST
+HttpResponse sendHttpRequest(String url, WiFiClient& wifiClient, String send_type, String post_payload, String user_agent, int timeout) {
+  HTTPClient httpClient;                // 实例化 http 客户端
+  httpClient.begin(wifiClient, url);    // 设置发送 URL
+  httpClient.setUserAgent(user_agent);  // 设置 UA
+  httpClient.setTimeout(timeout);       // 设置超时
+
+  Serial.print(F("Send "));
+  Serial.print(send_type);
+  Serial.print(F(" request to "));
+  Serial.print(url);
+  Serial.print(F(" with UA: "));
+  Serial.print(user_agent);
+  Serial.println();
+
+  HttpResponse response;
+  if (send_type == "GET") {
+    response.status_code = httpClient.GET();  // 状态码
+  } else if (send_type == "POST") {
+    response.status_code = httpClient.POST(post_payload);  // 状态码
+  } else {
+    Serial.println(F("send_type could only be GET or POST."));
+  }
+  response.content = httpClient.getString();  // 响应内容
+  httpClient.end();                           // 关闭连接
+
+  return response;
+}
+
 // 检测网络通断
 bool testNet(WiFiClient& wifiClient) {
-  Serial.println(F("Start testing the Internet."));
   static const vector<String> testServer = {
     "http://connect.rom.miui.com/generate_204",                    // 小米
     "http://connectivitycheck.platform.hicloud.com/generate_204",  // 华为
@@ -26,29 +55,13 @@ bool testNet(WiFiClient& wifiClient) {
   bool connected = false;
 
   for (int i = 0; i < 2; i++) {  // 尝试2次
-    // 实例化 http 客户端
-    HTTPClient httpClient;
-
     String URL = testServer[random(0, testServer.size() - 1)];
-    httpClient.begin(wifiClient, URL);
-    Serial.print(F("Use "));
-    Serial.print(URL);
-    Serial.print(F(" to test.\n"));
+    Serial.println(F("Start testing the Internet..."));
 
-    String UA = randomUA();
-    httpClient.setUserAgent(UA);
-    Serial.print(F("User-Agent: "));
-    Serial.print(UA);
-    Serial.println();
+    HttpResponse response;
+    response = sendHttpRequest(URL, wifiClient);  // 发送 HTTP 请求
 
-    httpClient.setTimeout(5000);  // 超时 5 秒
-
-    Serial.println(F("Sending Get to test net server..."));
-    int responseCode = httpClient.GET();  // 发送请求
-
-    httpClient.end();  // 关闭连接
-
-    if (responseCode == HTTP_CODE_NO_CONTENT) {  // 返回 204，连接成功
+    if (response.status_code == HTTP_CODE_NO_CONTENT) {  // 返回 204，连接成功
       connected = true;
       break;
     }
@@ -67,34 +80,28 @@ bool testNet(WiFiClient& wifiClient) {
 
 String ICACHE_FLASH_ATTR meow(String meow_url, WiFiClient& wifiClient) {
   // 定义反馈结果
-  String responsePayload = "0.0.0.0";
+  HttpResponse response;
   for (int i = 0; i < 2; i++) {  // 尝试2次
-    // 实例化 http 客户端
-    HTTPClient httpClient;
-
-    httpClient.begin(wifiClient, meow_url);
     Serial.print(F("Use "));
     Serial.print(meow_url);
     Serial.print(F(" to get IP.\n"));
+    response = sendHttpRequest(meow_url, wifiClient);  // 发送 HTTP 请求
 
-    Serial.println(F("Send get."));
-    int responseCode = httpClient.GET();  // 发送请求
-
-    if (responseCode == HTTP_CODE_OK) {  // 返回 200，连接成功
-      responsePayload = httpClient.getString();
-      responsePayload.trim();
+    if (response.status_code == HTTP_CODE_OK) {  // 返回 200，连接成功
+      response.content.trim();
       break;
+    } else {
+      response.content = "0.0.0.0";
     }
-    httpClient.end();  // 关闭连接
   }
-  if (responsePayload == "0.0.0.0") {  // 如果返回 "0.0.0.0"，则认为获取失败。meow 也是这样定义的。
+  if (response.content == "0.0.0.0") {  // 如果返回 "0.0.0.0"，则认为获取失败。meow 也是这样定义的。
     Serial.println(F("Can't connect to meow server."));
   } else {
     Serial.print(F("Get IP: "));
-    Serial.print(responsePayload);
+    Serial.print(response.content);
     Serial.println();
   }
-  return responsePayload;
+  return response.content;
 }
 
 // 用于 http 服务器，获取文件类型
