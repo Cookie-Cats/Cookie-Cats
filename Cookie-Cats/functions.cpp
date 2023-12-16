@@ -231,7 +231,7 @@ void ICACHE_FLASH_ATTR readConfigurationFromFile(File& file, Configuration& conf
 
   // 学校
   if (config.containsKey("school")) {
-    vector<String> Schools = { "CPU" };
+    vector<String> Schools = { "CPU", "NJUPT" };
     String school = (const char*)config["school"];
 
     // --------------------------------------------------------------------------------------------------------------------------------

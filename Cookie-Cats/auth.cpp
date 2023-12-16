@@ -73,7 +73,11 @@ String ICACHE_FLASH_ATTR getDrcomIp(String apiURL, WiFiClient &wifiClient) {
   return IP;
 }
 
+// --------------------------------------------------------------------------------------------------------------------------------
+// 注意：这个是 DrCom 认证的参考实现
+
 // 中国药科大学
+// 状态：已实现|已验证
 bool ICACHE_FLASH_ATTR authCPU(Configuration &config, WiFiClient &wifiClient) {
   if (config.carrier == "SchoolNetwork") {                 // 中国药科大学校园网
     String IP;                                             // 获取 IP
@@ -95,6 +99,28 @@ bool ICACHE_FLASH_ATTR authCPU(Configuration &config, WiFiClient &wifiClient) {
     return drcomWebAuth(authURL, wifiClient);
   }
 }
+// --------------------------------------------------------------------------------------------------------------------------------
+
+// 南京邮电大学
+// 参考自：https://github.com/Lintkey/njupt_net
+// 状态：正在实现|未验证
+bool ICACHE_FLASH_ATTR authNJUPT(Configuration &config, WiFiClient &wifiClient) {
+  String carrier;
+  if (config.carrier == "ChinaTelecom") carrier = "@njxy";      // 电信
+  else if (config.carrier == "ChinaMobile") carrier = "@cmcc";  // 移动
+  else if (config.carrier == "SchoolNetwork") carrier = "";     // 校园网
+
+  // 构造认证 URL
+  // TODO: 可能可以使用 DrCom API 获取 IP，需要贵学校帮助
+  String authURL = "https://p.njupt.edu.cn:802/eportal/portal/login?callback=dr1003&login_method=1&user_account=" + config.username + carrier + "&user_password=" + config.password + "&wlan_user_ip=" + config.IP_Obtain_Method.second + "&wlan_user_ipv6=&wlan_user_mac=000000000000&wlan_ac_ip=&wlan_ac_name=&jsVersion=4.1.3&terminal_type=1&lang=zh-cn&v=6407&lang=zh";
+
+  HttpResponse response;
+  response = sendHttpRequest(authURL, wifiClient);  // 发送认证请求
+
+  // 测试网络连通情况
+  // 由于未知认证成功的特征，因此采用是否可以连通外网判断是否认证成功
+  return testNet(wifiClient);
+}
 
 // 自动认证
 // 警告：使用前需要判断 school、username、password 是否为空
@@ -102,6 +128,8 @@ bool auth(Configuration &config, WiFiClient &wifiClient) {
   Serial.println(F("Starting authoriation..."));
   if (config.school == "CPU") {  // 中国药科大学
     return authCPU(config, wifiClient);
+  } else if (config.school == "NJUPT") {
+    return authNJUPT(config, wifiClient);  // 南京邮电大学
   } else {
     return false;
   }

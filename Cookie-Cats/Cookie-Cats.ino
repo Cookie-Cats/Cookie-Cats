@@ -10,7 +10,7 @@
 #include "auth.h"
 #include "webpages.h"
 
-#define VERSION "PIONEER_0.1_alpha_prerelease_016"
+#define VERSION "PIONEER_0.1_alpha_prerelease_017"
 #define CONTRIBUTER "77, QiQi, and Cookie-Cats Org"
 #define SERIAL_BAUD 115200  // 串口波特率
 

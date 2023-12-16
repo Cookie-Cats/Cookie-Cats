@@ -32,32 +32,76 @@
 
 ## 认证系统使用指南
 
-* 中国药科大学宿舍网
+| 图示 | 含义               |
+| ---- | ------------------ |
+| ✅    | 已实现             |
+| ❌    | 未完成             |
+| 🚧    | 正在实现｜修复错误 |
+| 🤝    | 需要帮助           |
 
-  1. 将[路由器设置为 DHCP 客户端模式](https://lic.cpu.edu.cn/ee/c5/c7550a192197/page.htm)；
-  2. 绑定[运营商宽带与统一身份认证](https://lic.cpu.edu.cn/ee/c6/c7550a192198/page.htm)；
-  3. 阅读 [使用指南](#使用指南)，打开配置界面（第 2、3 步）；
-  4. 按图填写配置信息：
+### 中国药科大学宿舍网
 
-  <img src="imgs/cpu_d1.png" width=80% height=80% />
+| 类型 | 状态 |
+| ---- | ---- |
+| 实现 | ✅    |
+| 验证 | ✅    |
 
-  5. Cookie-Cats 将自动重启。如果 LED 灯在通电后 50 秒内快速闪烁 5 次，则连接 WiFi 成功；否则请见[常见问题](#常见问题)的第三个问题；
-  6. 如果 LED 连续闪烁 2 次，则为检测到网络断开、自动连接；如果 LED 闪烁 1 次，则为网络连接正常。Cookie-Cats 每隔 20 秒会自动检测连接状态；
-  7. 按照 [使用指南](#使用指南) 第 5 步操作。
+设置步骤：
 
-* 中国药科大学公共网
+1. 将[路由器设置为 DHCP 客户端模式](https://lic.cpu.edu.cn/ee/c5/c7550a192197/page.htm)；
+2. 绑定[运营商宽带与统一身份认证](https://lic.cpu.edu.cn/ee/c6/c7550a192198/page.htm)；
+3. 阅读 [使用指南](#使用指南)，打开配置界面（第 2、3 步）；
+4. 按图填写配置信息：
 
-  ⚠️ 中国药科大学公共网仅对实验室有线网、CPU 无线客户端等可以获取到 `10.7.x.x` 网段 IP 的设备开放。本选项应用场景包括但不限于为实验室等需要保持网络连接的路由器提供 24 小时联网保障。
+<img src="imgs/cpu_d1.png" width=80% height=80% />
 
-  1. 将路由器设置为 DHCP 客户端模式
+5. Cookie-Cats 将自动重启。如果 LED 灯在通电后 50 秒内快速闪烁 5 次，则连接 WiFi 成功；否则请见[常见问题](#常见问题)的第三个问题；
+6. 如果 LED 连续闪烁 2 次，则为检测到网络断开、自动连接；如果 LED 闪烁 1 次，则为网络连接正常。Cookie-Cats 每隔 20 秒会自动检测连接状态；
+7. 按照 [使用指南](#使用指南) 第 5 步操作。
 
-  2. 阅读 [使用指南](#使用指南)，打开配置界面（第 2、3 步）；
+### 中国药科大学校园网
 
-  3. 按图填写配置信息：
+| 类型 | 状态 |
+| ---- | ---- |
+| 实现 | ✅    |
+| 验证 | ✅    |
 
-     <img src="imgs/cpu_p1.png" width=80% height=80% />
+⚠️ 中国药科大学校园网仅对实验室有线网、CPU 无线客户端等可以获取到 `10.7.x.x` 网段 IP 的设备开放。本选项应用场景包括但不限于为实验室等需要保持网络连接的路由器提供 24 小时联网保障。
 
-     4. 如果 LED 连续闪烁 2 次，则为检测到网络断开、自动连接；如果 LED 闪烁 1 次，则为网络连接正常。Cookie-Cats 每隔 20 秒会自动检测连接状态。
+设置步骤：
+
+1. 将路由器设置为 DHCP 客户端模式
+
+2. 阅读 [使用指南](#使用指南)，打开配置界面（第 2、3 步）；
+
+3. 按图填写配置信息：
+
+   <img src="imgs/cpu_p1.png" width=80% height=80% />
+
+   4. 如果 LED 连续闪烁 2 次，则为检测到网络断开、自动连接；如果 LED 闪烁 1 次，则为网络连接正常。Cookie-Cats 每隔 20 秒会自动检测连接状态。
+
+### 南京邮电大学
+
+参考实现：[Lintkey/njupt_net](https://github.com/Lintkey/njupt_net)
+
+| 类型 | 状态                                                         |
+| ---- | ------------------------------------------------------------ |
+| 实现 | 🚧 \| 🤝                                                       |
+| 验证 | ❌ \| 🤝                                                       |
+| 备注 | 可使用 DrCom API 获取 IP；<br />未经过贵校志愿者测试；<br />校园网认证格式可能有误。 |
+
+设置步骤：
+
+1. 正确配置网络环境
+2. 按图填写配置信息：
+
+<img src="imgs/njupt.png" width=80% height=80% />
+
+3. Cookie-Cats 将自动重启。如果 LED 灯在通电后 50 秒内快速闪烁 5 次，则连接 WiFi 成功；否则请见[常见问题](#常见问题)的第三个问题；
+
+4. 如果 LED 连续闪烁 2 次，则为检测到网络断开、自动连接；如果 LED 闪烁 1 次，则为网络连接正常。Cookie-Cats 每隔 20 秒会自动检测连接状态；
+
+5. 按照 [使用指南](#使用指南) 第 5 步操作。
 
 ## 常见问题
 
@@ -170,7 +214,7 @@
 
 ## 引用与鸣谢
 
-### 本项目引用以下项目的代码
+### 本项目引用以下项目的代码：
 
 * [ESP8266 Arduino Core](https://github.com/esp8266/Arduino)，基于 GNU Lesser General Public License v2.1 许可下分发；
 * [ArduinoJson](https://arduinojson.org)，基于 MIT License 许可下分发；
@@ -178,12 +222,13 @@
 * [LittleFS](https://github.com/littlefs-project/littlefs)，基于 BSD 3-clause license 许可下分发；
 * [PracticalCrypto](https://github.com/gutierrezps/PracticalCrypto)，基于 GNU Lesser General Public License v2.1 许可下分发。
 
-### 本项目的实现参考以下代码或文献
+### 本项目的实现参考以下代码或文献：
 
 * [drcoms/drcom-generic](https://github.com/drcoms/drcom-generic)
 * [lucienshawls/CPU_Network_Auth](https://github.com/lucienshawls/CPU_Network_Auth)
 * [SpacehuhnTech/esp8266_deauther](https://github.com/SpacehuhnTech/esp8266_deauther)
 * [SpacehuhnTech/espwebtool](https://github.com/spacehuhntech/espwebtool)
+* [Lintkey/njupt_net](https://github.com/Lintkey/njupt_net)
 
 ## 许可证
 

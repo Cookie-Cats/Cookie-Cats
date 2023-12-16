@@ -18,6 +18,7 @@ public:
   // 学校
   // 目前支持的选项：
   // * CPU（中国药科大学）
+  // * NJUPT（南京邮电大学）
   String school;
   // IP 获取方式
   // IP_Obtain_Method: IP_Obtain_Method_Content
