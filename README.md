@@ -156,7 +156,7 @@
 
 6. 这个项目是开源的，是否意味着我可以自行购买开发版和使用此固件？
 
-​	当然可以，请遵循[许可证](#许可证)。
+   当然可以，请遵循[许可证](#许可证)。
 
 ## 开发文档
 
@@ -224,16 +224,17 @@
 
    | 地址                  | 请求类型 | 返回类型         | 状态码｜返回内容                                             | 备注                                                         |
    | --------------------- | -------- | ---------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
-   | /status/network       | GET      | text/plain       | 200｜"true"<br />200 \| "false"                              | 返回网络状态：<br />true 为可联网；false 为不可联网。        |
-   | /status/ip            | GET      | text/plain       | 200 \| IP                                                    | 当 config.IP_Obtain_Method 为 meow 时返回 IP；<br />当 config.IP_Obtain_Method 为 manual 时返回手动输入的 IP；<br />当 config.IP_Obtain_Method 为 ununcessary 或未填写时返回 "No IP method to found, please config IP method in config.json"。 |
+   | /status/network       | GET      | text/plain       | 200｜"true"<br />500 \| "false"                              | 返回网络状态：<br />200｜"true" 为可联网；500 \|"false" 为不可联网。 |
+   | /status/ip            | GET      | text/plain       | 200 \| IP                                                    | 当 config.IP_Obtain_Method 为 meow 时返回 IP；<br />当 config.IP_Obtain_Method 为 manual 时返回手动输入的 IP；<br />当 config.IP_Obtain_Method 为 ununcessary 或未填写时返回 "0.0.0.0"。 |
+   | /status/deviceip      | GET      | text/plain       | 200 \| IP<br />500 \| "0.0.0.0"                              | 如果 CookieCats 已连接 WiFi，则返回路由器分配给 CookieCats 的 IP ；否则返回 "0.0.0.0"。 |
    | /device/restart       | GET      | text/plain       | 200 \| "Restart now."                                        | Cookie-Cats 将立即重启。                                     |
    | /config/get           | GET      | application/json | 200 \| config<br />500 \| {\"error\":\"No config.json Found.\"} | 返回配置文件内容。                                           |
    | /config/save          | POST     | application/json | 200 \| {"success":"config.json saved."}<br />500 \| {"error":"Failed to save."}<br />500｜{\"error\":\"Invalid JSON format.\"} | 上传并保存配置文件；<br />如果 JSON 格式合法，将把接收到的 JSON 覆盖保存到 config.json。<br />测试命令：curl -X POST -H "Content-Type: application/json" -d '{"Cookie_Cat_SSID":"CookieCat","Cookie_Cat_PASSWORD":"cookiecat","WiFi_SSID":"","WiFi_PASSWORD":"","username":"","password":"","carrier":"","school":"","IP_Obtain_Method":{"meow":"http://192.168.10.151:8080"},"allowOTA":"true"}' http://192.168.4.1/config/save |
    | /config/rmconfig      | GET      | text/plain       | 200 \| "Removed config.json"<br />500 \| "No config.json found." | 清除配置并重启。                                             |
    | /firmware/version     | GET      | text/plain       | 200 \| VERSION                                               | 返回固件版本和作者信息。                                     |
-   | /firmware/allowupdate | GET      | text/plain       | 200 \| "true"<br />200 \| "false"                            | 返回是否允许自动更新。                                       |
+   | /firmware/allowupdate | GET      | text/plain       | 200 \| "true"<br />500 \| "false"                            | 返回是否允许自动更新。                                       |
    | /firmware/update      | GET      | text/plain       | 200 \| "Ok."                                                 | 强制更新，忽略固件和用户设置。<br />返回值不能表示是否更新。 |
-   | /auth/status          | GET      | text/plain       | 200 \| "true"<br />200 \| "false"                            | 返回认证程序状态；<br />true 为认证程序启动；false 为认证程序关闭。 |
+   | /auth/status          | GET      | text/plain       | 200 \| "true"<br />500 \| "false"                            | 返回认证程序状态；<br />true 为认证程序启动；false 为认证程序关闭。 |
 
 ## 引用与鸣谢
 

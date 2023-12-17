@@ -8,7 +8,7 @@
 #include "auth.h"
 #include "webpages.h"
 
-#define VERSION "PIONEER_0.1_alpha_prerelease_017"
+#define VERSION "PIONEER_0.1_alpha_prerelease_016"
 #define CONTRIBUTER "77, QiQi, and Cookie-Cats Org"
 #define SERIAL_BAUD 115200  // 串口波特率
 
@@ -148,7 +148,7 @@ void setup() {
     if (testNet()) {
       httpserver.send(200, "text/plain", "true");
     } else {
-      httpserver.send(200, "text/plain", "false");
+      httpserver.send(500, "text/plain", "false");
     }
   });
 
@@ -163,9 +163,21 @@ void setup() {
     } else if (configuration.IP_Obtain_Method.first == "manual") {
       ip = configuration.IP_Obtain_Method.second;
     } else {
-      ip = "No IP method to found, please config IP method in config.json";
+      ip = "0.0.0.0";
     }
     httpserver.send(200, "text/plain", ip);
+  });
+
+  // 返回路由器分配给 CookieCats 的 IP
+  // API，访问 "/status/deviceip" 返回路由器分配给 CookieCats 的 IP
+  // 如果 CookieCats 已连接 WiFi，则返回路由器分配给 CookieCats 的 IP ；否则返回 "0.0.0.0"
+  httpserver.on("/status/deviceip", HTTP_GET, []() {
+    String localIP = WiFi.localIP().toString();
+    if (localIP == "(IP unset)") {
+      httpserver.send(500, "text/plain", "0.0.0.0");
+    } else {
+      httpserver.send(200, "text/plain", localIP);
+    }
   });
 
   // 重启
@@ -235,6 +247,7 @@ void setup() {
       LittleFS.remove("/config.json");
       Serial.println(F("Removed config.json"));
       httpserver.send(200, "text/plain", "Removed config.json");
+      delay(1000);    // 确保 HTTP 响应
       ESP.restart();  // 重启以刷新配置
     } else {
       Serial.println(F("No config.json Found."));
@@ -259,7 +272,7 @@ void setup() {
     if (ALLOW_OTA_UPDATE && configuration.allowOTA && (WiFi.status() == WL_CONNECTED)) {
       httpserver.send(200, "text/plain", "true");
     } else {
-      httpserver.send(200, "text/plain", "false");
+      httpserver.send(500, "text/plain", "false");
     }
   });
 
@@ -278,7 +291,7 @@ void setup() {
     if (startAuth) {
       httpserver.send(200, "text/plain", "true");
     } else {
-      httpserver.send(200, "text/plain", "false");
+      httpserver.send(500, "text/plain", "false");
     }
   });
 
