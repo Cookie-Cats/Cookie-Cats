@@ -1,6 +1,6 @@
+#include <ArduinoJson.h>
 #include "HardwareSerial.h"
 #include "functions.h"
-#include <ArduinoJson.h>
 
 using namespace std;
 
@@ -16,7 +16,16 @@ String randomUA() {
 
 // 发送 http 请求
 // send_type: GET/POST
-HttpResponse sendHttpRequest(String url, WiFiClient& wifiClient, String send_type, String post_payload, String user_agent, int timeout) {
+HttpResponse sendHttpRequest(String url, String send_type, String post_payload, String user_agent, int timeout) {
+  /*
+  警告：由于 ESP8266 内存空间问题和更新问题，以及校园网内发生 MITM 的概率不大，这里的 HTTPS 是不安全的。它不会验证服务器的身份，可能会导致中间人攻击或数据泄露。
+  */
+  WiFiClient wifiClient;
+  if (url.startsWith("https")) {
+    WiFiClientSecure wifiClient;
+    wifiClient.setInsecure();  // 不安全的 HTTPS
+  }
+
   HTTPClient httpClient;                // 实例化 http 客户端
   httpClient.begin(wifiClient, url);    // 设置发送 URL
   httpClient.setUserAgent(user_agent);  // 设置 UA
@@ -45,7 +54,7 @@ HttpResponse sendHttpRequest(String url, WiFiClient& wifiClient, String send_typ
 }
 
 // 检测网络通断
-bool testNet(WiFiClient& wifiClient) {
+bool testNet() {
   static const vector<String> testServer = {
     "http://connect.rom.miui.com/generate_204",                    // 小米
     "http://connectivitycheck.platform.hicloud.com/generate_204",  // 华为
@@ -59,7 +68,7 @@ bool testNet(WiFiClient& wifiClient) {
     Serial.println(F("Start testing the Internet..."));
 
     HttpResponse response;
-    response = sendHttpRequest(URL, wifiClient);  // 发送 HTTP 请求
+    response = sendHttpRequest(URL);  // 发送 HTTP 请求
 
     if (response.status_code == HTTP_CODE_NO_CONTENT) {  // 返回 204，连接成功
       connected = true;
@@ -78,14 +87,14 @@ bool testNet(WiFiClient& wifiClient) {
 // 方法1：meow
 // 详见：https://github.com/Cookie-Cats/meow
 
-String ICACHE_FLASH_ATTR meow(String meow_url, WiFiClient& wifiClient) {
+String ICACHE_FLASH_ATTR meow(String meow_url) {
   // 定义反馈结果
   HttpResponse response;
   for (int i = 0; i < 2; i++) {  // 尝试2次
     Serial.print(F("Use "));
     Serial.print(meow_url);
     Serial.print(F(" to get IP.\n"));
-    response = sendHttpRequest(meow_url, wifiClient);  // 发送 HTTP 请求
+    response = sendHttpRequest(meow_url);  // 发送 HTTP 请求
 
     if (response.status_code == HTTP_CODE_OK) {  // 返回 200，连接成功
       response.content.trim();
@@ -307,7 +316,8 @@ void ICACHE_FLASH_ATTR readConfigurationFromFile(File& file, Configuration& conf
 }
 
 // OTA 更新
-void ICACHE_FLASH_ATTR otaUpdate(WiFiClient& wifiClient, String updateURL, String currentVersion) {
+void ICACHE_FLASH_ATTR otaUpdate(String updateURL, String currentVersion) {
+  WiFiClient wifiClient;
   t_httpUpdate_return ret = ESPhttpUpdate.update(wifiClient, updateURL, currentVersion);
   switch (ret) {
     case HTTP_UPDATE_FAILED:

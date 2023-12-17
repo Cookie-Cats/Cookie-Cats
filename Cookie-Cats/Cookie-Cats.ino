@@ -1,8 +1,6 @@
 #include <LittleFS.h>
-#include <WiFiClient.h>
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
-#include <ESP8266HTTPClient.h>
 #include <TickTwo.h>
 #include <ArduinoJson.h>
 #include "functions.h"
@@ -19,8 +17,6 @@
 
 using namespace std;
 
-WiFiClient wifiClient;
-
 // 在 80 端口实例化 http 服务器
 ESP8266WebServer httpserver(80);
 
@@ -34,7 +30,7 @@ Configuration configuration;
 bool startAuth = false;
 // 无论如何都创建用于认证的 Ticker 对象，每 20s 检查一次，是否运行根据 startAuth 判断。
 TickTwo CheckNetAndAuth([] {
-  checkNetAndAuth(configuration, wifiClient);
+  checkNetAndAuth(configuration);
 },
                         20000);
 
@@ -149,7 +145,7 @@ void setup() {
   // 网络状态
   // API。通过访问 "/status/network" 得到
   httpserver.on("/status/network", HTTP_GET, []() {
-    if (testNet(wifiClient)) {
+    if (testNet()) {
       httpserver.send(200, "text/plain", "true");
     } else {
       httpserver.send(200, "text/plain", "false");
@@ -163,7 +159,7 @@ void setup() {
   httpserver.on("/status/ip", HTTP_GET, []() {
     String ip;
     if (configuration.IP_Obtain_Method.first == "meow") {
-      ip = meow(configuration.IP_Obtain_Method.second, wifiClient);
+      ip = meow(configuration.IP_Obtain_Method.second);
     } else if (configuration.IP_Obtain_Method.first == "manual") {
       ip = configuration.IP_Obtain_Method.second;
     } else {
@@ -273,7 +269,7 @@ void setup() {
   httpserver.on("/firmware/update", HTTP_GET, []() {
     httpserver.send(200, "text/plain", "Ok.");
     Serial.println(F("Updating firmware..."));
-    otaUpdate(wifiClient, UPDATE_URL, VERSION);
+    otaUpdate(UPDATE_URL, VERSION);
   });
 
   // 返回认证程序是否启动
@@ -313,7 +309,7 @@ void setup() {
   // OTA 升级
   if (ALLOW_OTA_UPDATE && configuration.allowOTA && (WiFi.status() == WL_CONNECTED)) {  // 仅当 ALLOW_OTA_UPDATE 与 configuration.allowOTA 设置为 true 且 WiFi 已连接时更新。因为更新服务器可能在内网，所以不要求可以联网。
     Serial.println(F("Starting OTA upgrades..."));
-    otaUpdate(wifiClient, UPDATE_URL, VERSION);
+    otaUpdate(UPDATE_URL, VERSION);
   } else {
     Serial.println(F("Firmware is set to disallow OTA upgrades."));
   }
@@ -340,7 +336,7 @@ void setup() {
   blink(5);  // 闪烁 5 次，代表初始化成功
 
   yield();
-  if (startAuth) checkNetAndAuth(configuration, wifiClient);  // 立即认证
+  if (startAuth) checkNetAndAuth(configuration);  // 立即认证
 }
 
 void loop(void) {

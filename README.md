@@ -1,13 +1,19 @@
 # Cookie-Cats
 
-Cookie-Cats（或 CookieCats）是一个基于 ESP8266 开发的简约智能的校园网自动化认证工具。
+<div style="text-align: center;">
+  <img src="imgs/Cookie-Cats.jpg" width=40% height=40% style="margin: 10px" />
+  <br>
+  <img src="https://img.shields.io/badge/License-GPLv3-blue.svg" alt="License: GPLv3" />
+  <a href="https://app.codacy.com/gh/Cookie-Cats/Cookie-Cats/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade"><img src="https://app.codacy.com/project/badge/Grade/666824e7cbd14652a1c8d9db92b11f3b" alt="Codacy Badge" /></a>
+</div>
 
-<img src="imgs/Cookie-Cats.jpg" width=40% height=40% />
+
+Cookie-Cats（或 CookieCats）是一个基于 ESP8266 开发的简约智能的校园网自动化认证工具。
 
 ## 功能设计
 
 * **界面简约**，小白也可轻松使用；
-* **模块化设计**，易于二次开发：目前已支持认证中国药科大学宿舍网。仅需几行代码即可认证其他平台，详见[开发文档](#开发文档)；
+* **模块化设计**，易于二次开发：目前已支持认证[多所学校](#认证系统指南)。仅需几行代码即可认证其他平台，详见[开发文档](#开发文档)；
 * **架构独特，适配所有路由**：**无需**使用昂贵的带有认证功能的路由器，仅需一个便宜好用的 Cookie-Cats，即可免除一切烦恼；
 * **自动离线检测**：每 20 秒检测一次连接情况，离线自动重新认证；
 * **安全保护**：认证密钥使用 AES128-CBC 算法**加密保存**，无法被读取；**固件签名**技术保护您的 Cookie-Cats 免受恶意固件的攻击；
@@ -85,13 +91,13 @@ Cookie-Cats（或 CookieCats）是一个基于 ESP8266 开发的简约智能的�
 
 ### 南京邮电大学
 
-参考实现：[Lintkey/njupt_net](https://github.com/Lintkey/njupt_net)
+参考实现：[kaijy91/NJUPT_NET](https://github.com/kaijy91/NJUPT_NET)
 
 | 类型 | 状态                                                         |
 | ---- | ------------------------------------------------------------ |
 | 实现 | 🚧 \| 🤝                                                       |
 | 验证 | ❌ \| 🤝                                                       |
-| 备注 | 可使用 DrCom API 获取 IP；<br />未经过贵校志愿者测试；<br />校园网认证格式可能有误。 |
+| 备注 | 似乎没有可用的 DrCom API 获取 IP；<br />未经过贵校志愿者测试。 |
 
 设置步骤：
 
@@ -215,12 +221,12 @@ Cookie-Cats（或 CookieCats）是一个基于 ESP8266 开发的简约智能的�
    1. 从 [Amnesia](https://github.com/Cookie-Cats/Cookie-Cats/tree/main/Amnesia) 下载适当 Flash 大小的刷机固件，并按[提示](https://github.com/Cookie-Cats/Cookie-Cats/tree/main/Amnesia/README.md)操作；
    2. 你可以在[这里](https://update.cookiecats.diazepam.cc/)下载最新的 Cookie-Cats 固件，并按照相同的方法上传，即可强制刷机。
 
-6. API
+6. API 列表
 
    | 地址                  | 请求类型 | 返回类型         | 状态码｜返回内容                                             | 备注                                                         |
    | --------------------- | -------- | ---------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
    | /status/network       | GET      | text/plain       | 200｜"true"<br />200 \| "false"                              | 返回网络状态：<br />true 为可联网；false 为不可联网。        |
-   | /status/ip            | GET      | text/plain       | 200 \| IP                                                    | 当 config.IP_Obtain_Method 为 meow 时返回 IP；<br />当 config.IP_Obtain_Method 为 manual 时返回手动输入的 IP；<br />当 config.IP_Obtain_Method 为 ununcessary 时返回 0.0.0.0。 |
+   | /status/ip            | GET      | text/plain       | 200 \| IP                                                    | 当 config.IP_Obtain_Method 为 meow 时返回 IP；<br />当 config.IP_Obtain_Method 为 manual 时返回手动输入的 IP；<br />当 config.IP_Obtain_Method 为 ununcessary 或未填写时返回 "No IP method to found, please config IP method in config.json"。 |
    | /device/restart       | GET      | text/plain       | 200 \| "Restart now."                                        | Cookie-Cats 将立即重启。                                     |
    | /config/get           | GET      | application/json | 200 \| config<br />500 \| {\"error\":\"No config.json Found.\"} | 返回配置文件内容。                                           |
    | /config/save          | POST     | application/json | 200 \| {"success":"config.json saved."}<br />500 \| {"error":"Failed to save."}<br />500｜{\"error\":\"Invalid JSON format.\"} | 上传并保存配置文件；<br />如果 JSON 格式合法，将把接收到的 JSON 覆盖保存到 config.json。<br />测试命令：curl -X POST -H "Content-Type: application/json" -d '{"Cookie_Cat_SSID":"CookieCat","Cookie_Cat_PASSWORD":"cookiecat","WiFi_SSID":"","WiFi_PASSWORD":"","username":"","password":"","carrier":"","school":"","IP_Obtain_Method":{"meow":"http://192.168.10.151:8080"},"allowOTA":"true"}' http://192.168.4.1/config/save |
@@ -246,7 +252,7 @@ Cookie-Cats（或 CookieCats）是一个基于 ESP8266 开发的简约智能的�
 * [lucienshawls/CPU_Network_Auth](https://github.com/lucienshawls/CPU_Network_Auth)
 * [SpacehuhnTech/esp8266_deauther](https://github.com/SpacehuhnTech/esp8266_deauther)
 * [SpacehuhnTech/espwebtool](https://github.com/spacehuhntech/espwebtool)
-* [Lintkey/njupt_net](https://github.com/Lintkey/njupt_net)
+* [kaijy91/NJUPT_NET](https://github.com/kaijy91/NJUPT_NET)
 
 ## 许可证
 

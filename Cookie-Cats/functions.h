@@ -14,15 +14,15 @@ String randomUA();
 
 // 发送 http 请求
 // send_type: GET/POST
-HttpResponse sendHttpRequest(String url, WiFiClient &wifiClient, String send_type = "GET", String post_payload = "", String user_agent = randomUA(), int timeout = 5000);
+HttpResponse sendHttpRequest(String url, String send_type = "GET", String post_payload = "", String user_agent = randomUA(), int timeout = 5000);
 
 // 检测网络通断
-bool ICACHE_FLASH_ATTR testNet(WiFiClient &wifiClient);
+bool ICACHE_FLASH_ATTR testNet();
 
 // 获取当前 IP
 // 方法1：meow
 // 详见：https://github.com/Cookie-Cats/meow
-String ICACHE_FLASH_ATTR meow(String meow_url, WiFiClient &wifiClient);
+String ICACHE_FLASH_ATTR meow(String meow_url);
 
 // 用于 http 服务器，获取文件类型
 String ICACHE_FLASH_ATTR httpGetContentType(String filename);
@@ -31,7 +31,7 @@ String ICACHE_FLASH_ATTR httpGetContentType(String filename);
 void ICACHE_FLASH_ATTR readConfigurationFromFile(File &file, Configuration &configuration, PracticalCrypto &secret);
 
 // OTA 更新
-void ICACHE_FLASH_ATTR otaUpdate(WiFiClient &wifiClient, String updateURL, String currentVersion);
+void ICACHE_FLASH_ATTR otaUpdate(String updateURL, String currentVersion);
 
 // 读取是否存在 .secret 密钥文件
 // 如果不存在，就生成一个
