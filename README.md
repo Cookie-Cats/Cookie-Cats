@@ -1,19 +1,18 @@
-# Cookie-Cats
-
-<div style="text-align: center;">
-  <img src="imgs/Cookie-Cats.jpg" width=40% height=40% style="margin: 10px" />
+<div>
+  <img width="205" height="205" align="left" src="imgs/Cookie-Cats_edge.png" alt="Cookie-Cats"/>
   <br>
-  <img src="https://img.shields.io/badge/License-GPLv3-blue.svg" alt="License: GPLv3" />
-  <a href="https://app.codacy.com/gh/Cookie-Cats/Cookie-Cats/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade"><img src="https://app.codacy.com/project/badge/Grade/666824e7cbd14652a1c8d9db92b11f3b" alt="Codacy Badge" /></a>
+  <h1>Cookie-Cats</h1>
+  <p>Cookie-Cats（或 CookieCats）是一个基于 ESP8266 开发的简约智能的校园网自动化认证工具。支持所有品牌的路由器，积极为各高校提供校园网认证服务。</p>
 </div>
 
-
-Cookie-Cats（或 CookieCats）是一个基于 ESP8266 开发的简约智能的校园网自动化认证工具。
+[![Compile Sketch](https://github.com/Cookie-Cats/Cookie-Cats/actions/workflows/compile.yml/badge.svg?branch=main)](https://github.com/Cookie-Cats/Cookie-Cats/actions/workflows/compile.yml)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/666824e7cbd14652a1c8d9db92b11f3b)](https://app.codacy.com/gh/Cookie-Cats/Cookie-Cats/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
+[![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 ## 功能设计
 
 * **界面简约**，小白也可轻松使用；
-* **模块化设计**，易于二次开发：目前已支持认证[多所学校](#认证系统指南)。仅需几行代码即可认证其他平台，详见[开发文档](#开发文档)；
+* **模块化设计**，易于二次开发：目前已支持认证[多所学校](#认证系统使用指南)。仅需几行代码即可认证其他平台，详见[开发文档](#开发文档)；
 * **架构独特，适配所有路由**：**无需**使用昂贵的带有认证功能的路由器，仅需一个便宜好用的 Cookie-Cats，即可免除一切烦恼；
 * **自动离线检测**：每 20 秒检测一次连接情况，离线自动重新认证；
 * **安全保护**：认证密钥使用 AES128-CBC 算法**加密保存**，无法被读取；**固件签名**技术保护您的 Cookie-Cats 免受恶意固件的攻击；
