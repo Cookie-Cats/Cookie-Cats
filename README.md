@@ -278,6 +278,13 @@
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
 <!-- prettier-ignore-start -->
 <!-- markdownlint-disable -->
+<table>
+  <tbody>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="http://diazepam.cc"><img src="https://avatars.githubusercontent.com/u/102651183?v=4?s=100" width="100px;" alt="Diazepam"/><br /><sub><b>Diazepam</b></sub></a><br /><a href="#projectManagement-Metaphorme" title="Project Management">📆</a> <a href="#code-Metaphorme" title="Code">💻</a> <a href="#doc-Metaphorme" title="Documentation">📖</a> <a href="#design-Metaphorme" title="Design">🎨</a> <a href="#financial-Metaphorme" title="Financial">💵</a> <a href="#ideas-Metaphorme" title="Ideas, Planning, & Feedback">🤔</a> <a href="#maintenance-Metaphorme" title="Maintenance">🚧</a></td>
+    </tr>
+  </tbody>
+</table>
 
 <!-- markdownlint-restore -->
 <!-- prettier-ignore-end -->

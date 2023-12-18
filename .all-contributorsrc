@@ -1,4 +1,27 @@
 {
   "projectName": "Cookie-Cats",
-  "projectOwner": "Cookie-Cats"
+  "projectOwner": "Cookie-Cats",
+  "files": [
+    "README.md"
+  ],
+  "commitType": "docs",
+  "commitConvention": "angular",
+  "contributorsPerLine": 7,
+  "contributors": [
+    {
+      "login": "Metaphorme",
+      "name": "Diazepam",
+      "avatar_url": "https://avatars.githubusercontent.com/u/102651183?v=4",
+      "profile": "http://diazepam.cc",
+      "contributions": [
+        "projectManagement",
+        "code",
+        "doc",
+        "design",
+        "financial",
+        "ideas",
+        "maintenance"
+      ]
+    }
+  ]
 }
