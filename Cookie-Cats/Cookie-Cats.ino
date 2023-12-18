@@ -79,10 +79,10 @@ void setup() {
 
   // 载入自定义配置
   Serial.println(F("Loading config.json..."));
-  if (LittleFS.exists("/config.json")) {                     // 如果 config.json 可以在LittleFS中找到
-    File file = LittleFS.open("/config.json", "r");          // 则尝试打开该文件
+  if (LittleFS.exists("/config.json")) {              // 如果 config.json 可以在LittleFS中找到
+    File file = LittleFS.open("/config.json", "r");   // 则尝试打开该文件
     readConfigurationFromFile(file, config, secret);  // 读取配置文件
-    file.close();                                            // 关闭文件
+    file.close();                                     // 关闭文件
   } else {
     Serial.println(F("No config.json found, use default settings."));
   }

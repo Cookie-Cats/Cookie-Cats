@@ -9,8 +9,7 @@ using namespace std;
 // drcom 网页认证
 bool ICACHE_FLASH_ATTR drcomWebAuth(String authURL) {
   Serial.println(F("Sending auth message..."));
-  HttpResponse response;
-  response = sendHttpRequest(authURL);  // 发送 HTTP 请求
+  HttpResponse response = sendHttpRequest(authURL);  // 发送 HTTP 请求
 
   bool authSuccess = false;
   if (response.status_code == HTTP_CODE_OK) {  // 返回 200，连接成功
@@ -44,8 +43,7 @@ bool ICACHE_FLASH_ATTR drcomWebAuth(String authURL) {
 */
 String ICACHE_FLASH_ATTR getDrcomIp(String apiURL) {
   Serial.println(F("Try to get IP by Drcom API..."));
-  HttpResponse response;
-  response = sendHttpRequest(apiURL);  // 发送 HTTP 请求
+  HttpResponse response = sendHttpRequest(apiURL);  // 发送 HTTP 请求
 
   String IP;
   if (response.status_code == HTTP_CODE_OK) {  // 返回 200，连接成功
@@ -79,11 +77,12 @@ String ICACHE_FLASH_ATTR getDrcomIp(String apiURL) {
 // 中国药科大学
 // 状态：已实现|已验证
 bool ICACHE_FLASH_ATTR authCPU(Configuration &config) {
-  if (config.carrier == "SchoolNetwork") {                 // 中国药科大学校园网   
-    String IP = getIPFromIPObtainMethod(config);  // 获取 IP
+  if (config.carrier == "SchoolNetwork") {  // 中国药科大学校园网
+    // 获取 IP
+    String IP = getIPFromIPObtainMethod(config);
     if (IP == "0.0.0.0") {  // 未设置 IP 获取方式或选择 unnecessary
       String apiURL = "http://192.168.199.21/drcom/chkstatus?callback=dr1002";
-      IP = getDrcomIp(apiURL);
+      IP = getDrcomIp(apiURL);  // 通过 DrCOM API 获取 IP
     }
 
     // 构造认证 URL
@@ -101,17 +100,34 @@ bool ICACHE_FLASH_ATTR authCPU(Configuration &config) {
 // --------------------------------------------------------------------------------------------------------------------------------
 
 // 南京邮电大学
-// 参考自：https://github.com/Lintkey/njupt_net
+/*
+鸣谢：
+
+参考自：https://github.com/Lintkey/njupt_net
+
+感谢以下同学提供的支持和鼓励（按照时间顺序排列，不分前后）：
+* MartinLingYi @https://github.com/MartinLingYi
+* kurtleee @https://github.com/kurtleee
+
+*/
 // 状态：正在实现|未验证
 bool ICACHE_FLASH_ATTR authNJUPT(Configuration &config) {
+  // 获取 IP
+  // 提供者：kurtleee @https://github.com/kurtleee
+  String IP = getIPFromIPObtainMethod(config);
+  if (IP == "0.0.0.0") {  // 未设置 IP 获取方式或选择 unnecessary
+    String apiURL = "http://10.100.200.3/drcom/chkstatus?callback=dr1002";
+    IP = getDrcomIp(apiURL);  // 通过 DrCOM API 获取 IP
+  }
+
   String username;
   if (config.carrier == "ChinaTelecom") username = ",0," + config.username + "@njxy";      // 电信
   else if (config.carrier == "ChinaMobile") username = ",0," + config.username + "@cmcc";  // 移动
   else if (config.carrier == "SchoolNetwork") username = config.username;                  // 校园网
 
   // 构造认证 URL
-  // 待确认：似乎并没有可用的 DrCOM API 获取 IP
-  String authURL = "https://p.njupt.edu.cn:802/eportal/portal/login?callback=dr1003&login_method=1&user_account=" + username + "&user_password=" + config.password + "&wlan_user_ip=" + config.IP_Obtain_Method.second + "&wlan_user_ipv6=&wlan_user_mac=000000000000&wlan_ac_ip=&wlan_ac_name=&jsVersion=4.1.3&terminal_type=1&lang=zh-cn&v=6407&lang=zh";
+  // 提供者：MartinLingYi @https://github.com/MartinLingYi
+  String authURL = "https://p.njupt.edu.cn:802/eportal/portal/login?callback=dr1003&login_method=1&user_account=" + username + "&user_password=" + config.password + "&wlan_user_ip=" + IP + "&wlan_user_ipv6=&wlan_user_mac=000000000000&wlan_ac_ip=&wlan_ac_name=&jsVersion=4.1.3&terminal_type=1&lang=zh-cn&v=6407&lang=zh";
 
   return drcomWebAuth(authURL);
 }

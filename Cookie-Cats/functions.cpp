@@ -385,9 +385,10 @@ void blink(int times) {
 
 // 从 IP_Obtain_Method 获取 IP
 // 当未设置 IP_Obtain_Method 或 IP_Obtain_Method 设置为 unnucessary 时会返回 "0.0.0.0"
-String ICACHE_FLASH_ATTR getIPFromIPObtainMethod(Configuration &config) {
+String ICACHE_FLASH_ATTR getIPFromIPObtainMethod(Configuration& config) {
   if (config.IP_Obtain_Method.first == "") {  // 未设置
-    return "0.0.0.0";
+    String IP = "0.0.0.0";
+    return IP;
   } else if (config.IP_Obtain_Method.first == "meow") {  // meow
     return meow(config.IP_Obtain_Method.second);
   } else {  // unnecessary 或 manual
