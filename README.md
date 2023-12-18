@@ -19,7 +19,9 @@
 * **自动更新**：搭配 **Cloudflare Workers 边缘函数**与 **Cloudflare R2 全球分布式存储**分发固件；仅需**重启设备**即可自动更新固件；
 * **开源共建**：固件源代码开源，无需担心后门。
 
-<img src="imgs/interface.png" width=80% height=80% />
+<div style="text-align: center;">
+  <img src="imgs/interface.png" style="display: block;" />
+</div>
 
 ## 使用指南
 
@@ -60,7 +62,9 @@
 3. 阅读 [使用指南](#使用指南)，打开配置界面（第 2、3 步）；
 4. 按图填写配置信息：
 
-<img src="imgs/cpu_d1.png" width=80% height=80% />
+<div style="text-align: center;">
+  <img src="imgs/cpu_d1.png" style="display: block;" />
+</div>
 
 5. Cookie-Cats 将自动重启。如果 LED 灯在通电后 50 秒内快速闪烁 5 次，则连接 WiFi 成功；否则请见[常见问题](#常见问题)的第三个问题；
 6. 如果 LED 连续闪烁 2 次，则为检测到网络断开、自动连接；如果 LED 闪烁 1 次，则为网络连接正常。Cookie-Cats 每隔 20 秒会自动检测连接状态；
@@ -84,9 +88,11 @@
 
 3. 按图填写配置信息：
 
-   <img src="imgs/cpu_p1.png" width=80% height=80% />
+<div style="text-align: center;">
+  <img src="imgs/cpu_p1.png" style="display: block;" />
+</div>
 
-   4. 如果 LED 连续闪烁 2 次，则为检测到网络断开、自动连接；如果 LED 闪烁 1 次，则为网络连接正常。Cookie-Cats 每隔 20 秒会自动检测连接状态。
+4. 如果 LED 连续闪烁 2 次，则为检测到网络断开、自动连接；如果 LED 闪烁 1 次，则为网络连接正常。Cookie-Cats 每隔 20 秒会自动检测连接状态。
 
 ### 南京邮电大学
 
@@ -103,7 +109,9 @@
 1. 正确配置网络环境
 2. 按图填写配置信息：
 
-<img src="imgs/njupt.png" width=80% height=80% />
+<div style="text-align: center;">
+  <img src="imgs/njupt.png" style="display: block;" />
+</div>
 
 3. Cookie-Cats 将自动重启。如果 LED 灯在通电后 50 秒内快速闪烁 5 次，则连接 WiFi 成功；否则请见[常见问题](#常见问题)的第三个问题；
 
@@ -211,7 +219,9 @@
 
    * 使用 meow
 
-     <img src="imgs/meow_principle.png" width=80% height=80% />
+   <div style="text-align: center;">
+    <img src="imgs/meow_principle.png" style="display: block;" />
+   </div>
 
    * 手动输入
 
