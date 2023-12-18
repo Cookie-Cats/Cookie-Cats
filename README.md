@@ -286,6 +286,7 @@
       <td align="center" valign="top" width="14.28%"><a href="https://www.hfdem.net"><img src="https://avatars.githubusercontent.com/u/47923741?v=4?s=100" width="100px;" alt="hfdem"/><br /><sub><b>hfdem</b></sub></a><br /><a href="#mentoring-hfdem" title="Mentoring">🧑‍🏫</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://www.hwpo.top"><img src="https://avatars.githubusercontent.com/u/82591976?v=4?s=100" width="100px;" alt="Lucien Shaw"/><br /><sub><b>Lucien Shaw</b></sub></a><br /><a href="#research-lucienshawls" title="Research">🔬</a> <a href="#userTesting-lucienshawls" title="User Testing">📓</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/LenaASu"><img src="https://avatars.githubusercontent.com/u/114927472?v=4?s=100" width="100px;" alt="Lena"/><br /><sub><b>Lena</b></sub></a><br /><a href="#design-LenaASu" title="Design">🎨</a> <a href="#userTesting-LenaASu" title="User Testing">📓</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/MartinLingYi"><img src="https://avatars.githubusercontent.com/u/144036350?v=4?s=100" width="100px;" alt="MartinLingYi"/><br /><sub><b>MartinLingYi</b></sub></a><br /><a href="#research-MartinLingYi" title="Research">🔬</a> <a href="#userTesting-MartinLingYi" title="User Testing">📓</a></td>
     </tr>
   </tbody>
 </table>
