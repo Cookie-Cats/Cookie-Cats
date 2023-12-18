@@ -246,6 +246,14 @@
    | /firmware/update      | GET      | text/plain       | 200 \| "Ok."                                                 | 强制更新，忽略固件和用户设置。<br />返回值不能表示是否更新。 |
    | /auth/status          | GET      | text/plain       | 200 \| "true"<br />500 \| "false"                            | 返回认证程序状态；<br />true 为认证程序启动；false 为认证程序关闭。 |
 
+## 文档版本
+
+适用于 CookieCats PIONEER_0.1_alpha_prerelease_017。
+
+## 固件下载
+
+你可以在 [https://update.cookiecats.diazepam.cc](https://update.cookiecats.diazepam.cc) 下载最新的 Cookie-Cats 固件。
+
 ## 引用与鸣谢
 
 ### 本项目引用以下项目的代码：
@@ -263,17 +271,23 @@
 * [SpacehuhnTech/esp8266_deauther](https://github.com/SpacehuhnTech/esp8266_deauther)
 * [SpacehuhnTech/espwebtool](https://github.com/spacehuhntech/espwebtool)
 * [kaijy91/NJUPT_NET](https://github.com/kaijy91/NJUPT_NET)
+* [all-contributors/all-contributors](https://github.com/all-contributors/all-contributors)
+
+## 贡献者
+
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable -->
+
+<!-- markdownlint-restore -->
+<!-- prettier-ignore-end -->
+
+<!-- ALL-CONTRIBUTORS-LIST:END -->
+
+感谢所有为项目作出贡献的朋友们！Cookie-Cats 欢迎您的加入和支持！喵～
 
 ## 许可证
 
 [Cookie-Cats](https://github.com/Cookie-Cats/Cookie-Cats) 在 [GNU General Public License v3.0 的改进许可](https://github.com/Cookie-Cats/Cookie-Cats/blob/main/LICENSE)下发行。
 
-[改进许可](https://github.com/Cookie-Cats/Cookie-Cats/blob/main/LICENSE#L676)指：你可以自由地在 GNU General Public License v3.0 许可下对本项目进行商业使用。每个 - 消费者的总付费（包括月租等方式）必须小于使用场景下运营商宽带最低包月价格。
-
-## 文档版本
-
-适用于 CookieCats PIONEER_0.1_alpha_prerelease_017。
-
-## 固件下载
-
-你可以在 [https://update.cookiecats.diazepam.cc](https://update.cookiecats.diazepam.cc) 下载最新的 Cookie-Cats 固件。
+[改进许可](https://github.com/Cookie-Cats/Cookie-Cats/blob/main/LICENSE#L676)指：你可以自由地在 GNU General Public License v3.0 许可下对本项目进行商业使用。每个消费者的总付费（包括月租等方式）必须小于使用场景下运营商宽带最低包月价格。
