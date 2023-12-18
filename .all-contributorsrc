@@ -53,6 +53,16 @@
         "research",
         "userTesting"
       ]
+    },
+    {
+      "login": "LenaASu",
+      "name": "Lena",
+      "avatar_url": "https://avatars.githubusercontent.com/u/114927472?v=4",
+      "profile": "https://github.com/LenaASu",
+      "contributions": [
+        "design",
+        "userTesting"
+      ]
     }
   ]
 }
