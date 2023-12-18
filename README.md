@@ -248,7 +248,7 @@
 
 ## 文档版本
 
-适用于 CookieCats PIONEER_0.1_alpha_prerelease_017。
+适用于 CookieCats PIONEER_alpha_prerelease_017。
 
 ## 固件下载
 
@@ -282,7 +282,7 @@
   <tbody>
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="http://diazepam.cc"><img src="https://avatars.githubusercontent.com/u/102651183?v=4?s=100" width="100px;" alt="Diazepam"/><br /><sub><b>Diazepam</b></sub></a><br /><a href="#projectManagement-Metaphorme" title="Project Management">📆</a> <a href="#code-Metaphorme" title="Code">💻</a> <a href="#doc-Metaphorme" title="Documentation">📖</a> <a href="#design-Metaphorme" title="Design">🎨</a> <a href="#financial-Metaphorme" title="Financial">💵</a> <a href="#ideas-Metaphorme" title="Ideas, Planning, & Feedback">🤔</a> <a href="#maintenance-Metaphorme" title="Maintenance">🚧</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/ytawm"><img src="https://avatars.githubusercontent.com/u/93414494?v=4?s=100" width="100px;" alt="TimeCrystal"/><br /><sub><b>TimeCrystal</b></sub></a><br /><a href="#projectManagement-ytawm" title="Project Management">📆</a> <a href="#code-ytawm" title="Code">💻</a> <a href="#design-ytawm" title="Design">🎨</a> <a href="#ideas-ytawm" title="Ideas, Planning, & Feedback">🤔</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/ytawm"><img src="https://avatars.githubusercontent.com/u/93414494?v=4?s=100" width="100px;" alt="TimeCrystal"/><br /><sub><b>TimeCrystal</b></sub></a><br /><a href="#projectManagement-ytawm" title="Project Management">📆</a> <a href="#code-ytawm" title="Code">💻</a> <a href="#design-ytawm" title="Design">🎨</a> <a href="#ideas-ytawm" title="Ideas, Planning, & Feedback">🤔</a> <a href="#maintenance-ytawm" title="Maintenance">🚧</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://www.hfdem.net"><img src="https://avatars.githubusercontent.com/u/47923741?v=4?s=100" width="100px;" alt="hfdem"/><br /><sub><b>hfdem</b></sub></a><br /><a href="#mentoring-hfdem" title="Mentoring">🧑‍🏫</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://www.hwpo.top"><img src="https://avatars.githubusercontent.com/u/82591976?v=4?s=100" width="100px;" alt="Lucien Shaw"/><br /><sub><b>Lucien Shaw</b></sub></a><br /><a href="#research-lucienshawls" title="Research">🔬</a> <a href="#userTesting-lucienshawls" title="User Testing">📓</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/LenaASu"><img src="https://avatars.githubusercontent.com/u/114927472?v=4?s=100" width="100px;" alt="Lena"/><br /><sub><b>Lena</b></sub></a><br /><a href="#design-LenaASu" title="Design">🎨</a> <a href="#userTesting-LenaASu" title="User Testing">📓</a></td>
