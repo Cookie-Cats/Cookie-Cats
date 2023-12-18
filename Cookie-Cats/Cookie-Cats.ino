@@ -24,13 +24,13 @@ ESP8266WebServer httpserver(80);
 PracticalCrypto secret;
 
 // 实例化配置项
-Configuration configuration;
+Configuration config;
 
 // 认证程序是否启动
 bool startAuth = false;
 // 无论如何都创建用于认证的 Ticker 对象，每 20s 检查一次，是否运行根据 startAuth 判断。
 TickTwo CheckNetAndAuth([] {
-  checkNetAndAuth(configuration);
+  checkNetAndAuth(config);
 },
                         20000);
 
@@ -81,7 +81,7 @@ void setup() {
   Serial.println(F("Loading config.json..."));
   if (LittleFS.exists("/config.json")) {                     // 如果 config.json 可以在LittleFS中找到
     File file = LittleFS.open("/config.json", "r");          // 则尝试打开该文件
-    readConfigurationFromFile(file, configuration, secret);  // 读取配置文件
+    readConfigurationFromFile(file, config, secret);  // 读取配置文件
     file.close();                                            // 关闭文件
   } else {
     Serial.println(F("No config.json found, use default settings."));
@@ -91,22 +91,22 @@ void setup() {
   WiFi.mode(WIFI_AP_STA);
   WiFi.hostname("Cookie-Cats");
 
-  WiFi.softAP(configuration.Cookie_Cat_SSID, configuration.Cookie_Cat_PASSWORD);  // 设置 WiFi 接入点
+  WiFi.softAP(config.Cookie_Cat_SSID, config.Cookie_Cat_PASSWORD);  // 设置 WiFi 接入点
   Serial.print(F("WiFi access point SSID: "));
-  Serial.print(configuration.Cookie_Cat_SSID);
+  Serial.print(config.Cookie_Cat_SSID);
   Serial.println();
   Serial.print(F("WiFi access point Password: "));
-  Serial.print(configuration.Cookie_Cat_PASSWORD);
+  Serial.print(config.Cookie_Cat_PASSWORD);
   Serial.println();
   Serial.print(F("Cookie-Cat is on:"));
   Serial.print(WiFi.softAPIP());
   Serial.println();
 
   // 连接 WiFi
-  if (configuration.WiFi_SSID != "") {
-    WiFi.begin(configuration.WiFi_SSID, configuration.WiFi_PASSWORD);
+  if (config.WiFi_SSID != "") {
+    WiFi.begin(config.WiFi_SSID, config.WiFi_PASSWORD);
     Serial.print(F("Connecting to "));
-    Serial.print(configuration.WiFi_SSID);
+    Serial.print(config.WiFi_SSID);
     Serial.println();
     delay(1000);  // 等待 WiFi 连接
 
@@ -114,7 +114,7 @@ void setup() {
       if (WiFi.status() == WL_CONNECTED) {
         Serial.println(F("Connected!"));
         Serial.print(F("IP address for network "));
-        Serial.print(configuration.WiFi_SSID);
+        Serial.print(config.WiFi_SSID);
         Serial.print(F(": "));
         Serial.println(WiFi.localIP());
         break;
@@ -126,7 +126,7 @@ void setup() {
     if (WiFi.status() != WL_CONNECTED) {
       WiFi.disconnect(true);  // 停止连接 WiFi
       Serial.print(F("Cannot connect to "));
-      Serial.print(configuration.WiFi_SSID);
+      Serial.print(config.WiFi_SSID);
       Serial.print(F(". Skip."));
       Serial.println();
     }
@@ -157,15 +157,7 @@ void setup() {
   // 当 config.IP_Obtain_Method 为 ununcessary 时返回 0.0.0.0
   // TODO：目前仅支持 meow 和 manual，之后将增加其他方法
   httpserver.on("/status/ip", HTTP_GET, []() {
-    String ip;
-    if (configuration.IP_Obtain_Method.first == "meow") {
-      ip = meow(configuration.IP_Obtain_Method.second);
-    } else if (configuration.IP_Obtain_Method.first == "manual") {
-      ip = configuration.IP_Obtain_Method.second;
-    } else {
-      ip = "0.0.0.0";
-    }
-    httpserver.send(200, "text/plain", ip);
+    httpserver.send(200, "text/plain", getIPFromIPObtainMethod(config));
   });
 
   // 返回路由器分配给 CookieCats 的 IP
@@ -269,7 +261,7 @@ void setup() {
   // 是否允许自动更新
   // API，访问 "/firmware/allowupdate" 将返回是否允许自动更新
   httpserver.on("/firmware/allowupdate", HTTP_GET, []() {
-    if (ALLOW_OTA_UPDATE && configuration.allowOTA && (WiFi.status() == WL_CONNECTED)) {
+    if (ALLOW_OTA_UPDATE && config.allowOTA && (WiFi.status() == WL_CONNECTED)) {
       httpserver.send(200, "text/plain", "true");
     } else {
       httpserver.send(500, "text/plain", "false");
@@ -311,7 +303,7 @@ void setup() {
   Serial.println(F("HTTP server started on :80"));
 
   // 判断是否开启认证程序
-  if ((configuration.school == "") || (configuration.username == "") || (configuration.password == "")) {
+  if ((config.school == "") || (config.username == "") || (config.password == "")) {
     Serial.println(F("No school or username or password set. Skip."));
   } else {
     Serial.println(F("Configuration of authoriation found. Set startAuth flag to true."));
@@ -320,7 +312,7 @@ void setup() {
   CheckNetAndAuth.start();  // 启动 Ticker 对象
 
   // OTA 升级
-  if (ALLOW_OTA_UPDATE && configuration.allowOTA && (WiFi.status() == WL_CONNECTED)) {  // 仅当 ALLOW_OTA_UPDATE 与 configuration.allowOTA 设置为 true 且 WiFi 已连接时更新。因为更新服务器可能在内网，所以不要求可以联网。
+  if (ALLOW_OTA_UPDATE && config.allowOTA && (WiFi.status() == WL_CONNECTED)) {  // 仅当 ALLOW_OTA_UPDATE 与 config.allowOTA 设置为 true 且 WiFi 已连接时更新。因为更新服务器可能在内网，所以不要求可以联网。
     Serial.println(F("Starting OTA upgrades..."));
     otaUpdate(UPDATE_URL, VERSION);
   } else {
@@ -349,7 +341,7 @@ void setup() {
   blink(5);  // 闪烁 5 次，代表初始化成功
 
   yield();
-  if (startAuth) checkNetAndAuth(configuration);  // 立即认证
+  if (startAuth) checkNetAndAuth(config);  // 立即认证
 }
 
 void loop(void) {

@@ -79,14 +79,13 @@ String ICACHE_FLASH_ATTR getDrcomIp(String apiURL) {
 // 中国药科大学
 // 状态：已实现|已验证
 bool ICACHE_FLASH_ATTR authCPU(Configuration &config) {
-  if (config.carrier == "SchoolNetwork") {                 // 中国药科大学校园网
-    String IP;                                             // 获取 IP
-    if (config.IP_Obtain_Method.first == "unnecessary") {  // 如果设置为 unnecessary，则从 Drcom 的 API 获取
+  if (config.carrier == "SchoolNetwork") {                 // 中国药科大学校园网   
+    String IP = getIPFromIPObtainMethod(config);  // 获取 IP
+    if (IP == "0.0.0.0") {  // 未设置 IP 获取方式或选择 unnecessary
       String apiURL = "http://192.168.199.21/drcom/chkstatus?callback=dr1002";
       IP = getDrcomIp(apiURL);
-    } else {
-      IP = config.IP_Obtain_Method.second;
     }
+
     // 构造认证 URL
     String authURL = "http://192.168.199.21:801/eportal/?c=Portal&a=login&callback=dr1004&login_method=1&user_account=,0," + config.username + "&user_password=" + config.password + "&wlan_user_ip=" + IP + "&wlan_user_mac=000000000000&jsVersion=3.3.3&v=10379";
     return drcomWebAuth(authURL);                               // 发送认证请求

@@ -292,7 +292,7 @@ void ICACHE_FLASH_ATTR readConfigurationFromFile(File& file, Configuration& conf
       Serial.print(ip);
       Serial.println();
     } else if (IP_Obtain_Method.containsKey("unnecessary")) {         // 采用 unnecessary
-      configuration.IP_Obtain_Method = { "unnecessary", "0.0.0.0" };  // 默认 IP 0.0.0.0
+      configuration.IP_Obtain_Method = { "unnecessary", "0.0.0.0" };  // 默认选择 unnecessary 时 IP 为 0.0.0.0
       Serial.println(F("Set IP_Obtain_Method into unnecessary."));
     }
   } else {
@@ -358,7 +358,8 @@ void ICACHE_FLASH_ATTR readSecret(PracticalCrypto& secret) {
   }
 }
 
-// 定义一个函数，参数为times，表示 led 闪烁的次数，闪灯间隔 200 毫秒
+// 闪灯函数
+// 参数为times，表示 led 闪烁的次数，闪灯间隔 200 毫秒
 void blink(int times) {
   unsigned long last_change = 0;  // 定义一个变量，表示上一次改变led状态的时间，初始为0
   unsigned long interval = 200;   // 闪灯间隔 200 毫秒
@@ -380,4 +381,16 @@ void blink(int times) {
     }
   }
   digitalWrite(LED_BUILTIN, true);  // 熄灯
+}
+
+// 从 IP_Obtain_Method 获取 IP
+// 当未设置 IP_Obtain_Method 或 IP_Obtain_Method 设置为 unnucessary 时会返回 "0.0.0.0"
+String ICACHE_FLASH_ATTR getIPFromIPObtainMethod(Configuration &config) {
+  if (config.IP_Obtain_Method.first == "") {  // 未设置
+    return "0.0.0.0";
+  } else if (config.IP_Obtain_Method.first == "meow") {  // meow
+    return meow(config.IP_Obtain_Method.second);
+  } else {  // unnecessary 或 manual
+    return config.IP_Obtain_Method.second;
+  }
 }

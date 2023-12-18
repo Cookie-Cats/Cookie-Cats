@@ -37,7 +37,13 @@ void ICACHE_FLASH_ATTR otaUpdate(String updateURL, String currentVersion);
 // 如果不存在，就生成一个
 void ICACHE_FLASH_ATTR readSecret(PracticalCrypto &secret);
 
-// 定义一个函数，参数为times，表示 led 闪烁的次数，闪灯间隔 200 毫秒
+// 闪灯函数
+// 参数为times，表示 led 闪烁的次数，闪灯间隔 200 毫秒
 void blink(int times);
+
+// 从 IP_Obtain_Method 获取 IP
+
+// 当未设置 IP_Obtain_Method 或 IP_Obtain_Method 设置为 unnucessary 时会返回 "0.0.0.0"
+String ICACHE_FLASH_ATTR getIPFromIPObtainMethod(Configuration &config);
 
 #endif  // FUNCTIONS_H
