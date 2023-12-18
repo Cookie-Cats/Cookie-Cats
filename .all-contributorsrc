@@ -43,6 +43,16 @@
       "contributions": [
         "mentoring"
       ]
+    },
+    {
+      "login": "lucienshawls",
+      "name": "Lucien Shaw",
+      "avatar_url": "https://avatars.githubusercontent.com/u/82591976?v=4",
+      "profile": "https://www.hwpo.top",
+      "contributions": [
+        "research",
+        "userTesting"
+      ]
     }
   ]
 }
