@@ -22,6 +22,18 @@
         "ideas",
         "maintenance"
       ]
+    },
+    {
+      "login": "ytawm",
+      "name": "TimeCrystal",
+      "avatar_url": "https://avatars.githubusercontent.com/u/93414494?v=4",
+      "profile": "https://github.com/ytawm",
+      "contributions": [
+        "projectManagement",
+        "code",
+        "design",
+        "ideas"
+      ]
     }
   ]
 }
