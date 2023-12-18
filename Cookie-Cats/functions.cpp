@@ -1,3 +1,5 @@
+#include "WiFiClientSecureBearSSL.h"
+#include "WiFiClient.h"
 #include <ArduinoJson.h>
 #include "HardwareSerial.h"
 #include "functions.h"
@@ -14,20 +16,21 @@ String randomUA() {
   return UAs[random(0, UAs.size() - 1)];
 }
 
-// 发送 http 请求
+// 发送 http 或 https 请求
 // send_type: GET/POST
+/*
+警告：由于 ESP8266 内存空间问题和更新问题，以及校园网内发生 MITM 的概率不大，这里的 HTTPS 是不安全的。它不会验证服务器的身份，可能会导致中间人攻击或数据泄露。
+*/
 HttpResponse sendHttpRequest(String url, String send_type, String post_payload, String user_agent, int timeout) {
-  /*
-  警告：由于 ESP8266 内存空间问题和更新问题，以及校园网内发生 MITM 的概率不大，这里的 HTTPS 是不安全的。它不会验证服务器的身份，可能会导致中间人攻击或数据泄露。
-  */
-  WiFiClient wifiClient;
-  if (url.startsWith("https")) {
+  HTTPClient httpClient;          // 实例化 http 客户端
+  if (url.startsWith("https")) {  // HTTPS
     WiFiClientSecure wifiClient;
     wifiClient.setInsecure();  // 不安全的 HTTPS
+    httpClient.begin(wifiClient, url);
+  } else {  // HTTP
+    WiFiClient wifiClient;
+    httpClient.begin(wifiClient, url);
   }
-
-  HTTPClient httpClient;                // 实例化 http 客户端
-  httpClient.begin(wifiClient, url);    // 设置发送 URL
   httpClient.setUserAgent(user_agent);  // 设置 UA
   httpClient.setTimeout(timeout);       // 设置超时
 
