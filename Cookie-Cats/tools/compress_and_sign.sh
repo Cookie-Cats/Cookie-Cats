@@ -2,7 +2,7 @@
 
 # 用于自动签名
 # Example:
-# ./compress_and_sign.sh PIONEER_0.1_alpha_prerelease_002 esp8266.esp8266.d1_mini
+# ./compress_and_sign.sh PIONEER_alpha_prerelease_002 esp8266.esp8266.d1_mini
 
 VERSION=$1
 FQBN=$2
