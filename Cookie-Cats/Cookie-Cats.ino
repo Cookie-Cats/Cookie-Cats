@@ -107,7 +107,6 @@ void setup() {
     WiFi.begin(config.WiFi_SSID, config.WiFi_PASSWORD);
     Serial.print(F("Connecting to "));
     Serial.print(config.WiFi_SSID);
-    Serial.println();
     delay(1000);  // 等待 WiFi 连接
 
     for (int i = 0; i < 500; i++) {  // 连接 WiFi，最多尝试 500 次
@@ -342,6 +341,16 @@ void setup() {
 
   yield();
   if (startAuth) checkNetAndAuth(config);  // 立即认证
+
+  /*
+  调试区
+  需要调试的代码请在这里进行调试。
+  发布新版本前请确认这里没有需要执行的内容。
+  */
+  // -------------------------------------------------------------DEBUG--------------------------------------------------------------
+  // Serial.println(F("-------DEBUG--------"));
+  // Serial.println(F("-----DEBUG END------"));
+  // -----------------------------------------------------------DEBUG END------------------------------------------------------------
 }
 
 void loop(void) {

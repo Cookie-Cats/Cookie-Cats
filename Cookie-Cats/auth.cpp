@@ -6,6 +6,38 @@
 
 using namespace std;
 
+// 从 302 跳转提取主机 IP:PORT
+/*
+Location = "http://192.169.1.1:80/index.html";
+提取内容："http://192.169.1.1:80/index.html" -> 192.169.1.1:80
+*/
+String ICACHE_FLASH_ATTR getIPFrom302Location() {
+  String url = "http://www.msftconnecttest.com/redirect";  // 微软重定向连接测试 URL，使用这个为了与一般 Windows 机器混淆
+  HTTPClient httpClient;                                   // 实例化 HTTP 客户端
+  WiFiClient wifiClient;
+  httpClient.begin(wifiClient, url);
+  httpClient.setUserAgent(randomUA());  // 设置 UA
+  const char *headerNames[] = { "Location" };
+  httpClient.collectHeaders(headerNames, 1);
+  int status_code = httpClient.GET();  // 发送请求
+
+  if ((status_code == HTTP_CODE_FOUND) && httpClient.hasHeader("Location")) {  // 302 状态码且存在 Location Header
+    String Location = httpClient.header("Location");
+    httpClient.end();  // 关闭连接
+    /*
+    Example Location: "http://192.168.1.1:80/index.html";
+    提取内容："http://192.168.1.1:80/index.html" -> 192.169.1.1:80
+    */
+    int start = Location.indexOf("//") + 2;  // 找到第一个斜杠后面的位置
+    int end = Location.indexOf("/", start);  // 找到第二个斜杠的位置
+    String host = Location.substring(start, end);
+    return host;
+  } else {
+    httpClient.end();  // 关闭连接
+    return String("0.0.0.0");
+  }
+}
+
 // drcom 网页认证
 bool ICACHE_FLASH_ATTR drcomWebAuth(String authURL) {
   Serial.println(F("Sending auth message..."));
@@ -49,10 +81,11 @@ String ICACHE_FLASH_ATTR getDrcomIp(String apiURL) {
   if (response.status_code == HTTP_CODE_OK) {  // 返回 200，连接成功
     Serial.println(F("Connected to Drcom status API."));
     // 寻找本机 IP
-    response.content.trim();                                 // 删除前后空格
-    response.content.remove(0, 7);                           // 删除 “dr1002(”
-    response.content.remove(response.content.length() - 1);  // 删除末尾括号
-    DynamicJsonDocument responseJson(1024);                  // 创建 Json 对象并解码
+    int start = response.content.indexOf("{");  // 第一个 {
+    response.content.remove(0, start);          // 删掉第一个 { 前的内容
+    int end = response.content.indexOf("}");    // 最后一个 }
+    response.content.remove(end + 1);           // 删掉第一个 } 后的内容
+    DynamicJsonDocument responseJson(1024);     // 创建 Json 对象并解码
     DeserializationError error = deserializeJson(responseJson, response.content);
     IP = responseJson["ss5"].as<String>();
     if (error || (IP == "")) {  // 如果解析出错
@@ -71,7 +104,7 @@ String ICACHE_FLASH_ATTR getDrcomIp(String apiURL) {
   return IP;
 }
 
-// --------------------------------------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------EXAMPLE-------------------------------------------------------------
 // 注意：这个是 DrCom 认证的参考实现
 
 // 中国药科大学
@@ -97,7 +130,7 @@ bool ICACHE_FLASH_ATTR authCPU(Configuration &config) {
     return drcomWebAuth(authURL);  // 发送认证请求
   }
 }
-// --------------------------------------------------------------------------------------------------------------------------------
+// ----------------------------------------------------------EXAMPLE END-----------------------------------------------------------
 
 // 南京邮电大学
 /*
@@ -134,7 +167,7 @@ bool ICACHE_FLASH_ATTR authNJUPT(Configuration &config) {
 
 // 自动认证
 // 警告：使用前需要判断 school、username、password 是否为空
-bool auth(Configuration &config) {
+bool ICACHE_FLASH_ATTR auth(Configuration &config) {
   Serial.println(F("Starting authoriation..."));
   if (config.school == "CPU") {  // 中国药科大学
     return authCPU(config);

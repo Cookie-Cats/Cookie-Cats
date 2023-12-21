@@ -11,6 +11,6 @@
 void checkNetAndAuth(Configuration &config);
 
 // 认证
-bool auth(Configuration &config);
+bool ICACHE_FLASH_ATTR auth(Configuration &config);
 
 #endif  // FUNCTIONS_AUTH

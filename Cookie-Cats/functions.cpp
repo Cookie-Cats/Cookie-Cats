@@ -8,7 +8,7 @@ using namespace std;
 
 // 获得随机 UA
 String randomUA() {
-  static const vector<String> UAs = {
+  const vector<String> UAs = {
     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36",
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36 Edg/105.0.1343.27",
     "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.106 Safari/537.36 OPR/38.0.2220.41"
@@ -22,7 +22,7 @@ String randomUA() {
 警告：由于 ESP8266 内存空间问题和更新问题，以及校园网内发生 MITM 的概率不大，这里的 HTTPS 是不安全的。它不会验证服务器的身份，可能会导致中间人攻击或数据泄露。
 */
 HttpResponse sendHttpRequest(String url, String send_type, String post_payload, String user_agent, int timeout) {
-  HTTPClient httpClient;          // 实例化 http 客户端
+  HTTPClient httpClient;          // 实例化 HTTP 客户端
   if (url.startsWith("https")) {  // HTTPS
     WiFiClientSecure wifiClient;
     wifiClient.setInsecure();  // 不安全的 HTTPS
@@ -58,7 +58,7 @@ HttpResponse sendHttpRequest(String url, String send_type, String post_payload, 
 
 // 检测网络通断
 bool testNet() {
-  static const vector<String> testServer = {
+  const vector<String> testServer = {
     "http://connect.rom.miui.com/generate_204",                    // 小米
     "http://connectivitycheck.platform.hicloud.com/generate_204",  // 华为
     "http://wifi.vivo.com.cn/generate_204"                         // vivo
@@ -387,8 +387,7 @@ void blink(int times) {
 // 当未设置 IP_Obtain_Method 或 IP_Obtain_Method 设置为 unnucessary 时会返回 "0.0.0.0"
 String ICACHE_FLASH_ATTR getIPFromIPObtainMethod(Configuration& config) {
   if (config.IP_Obtain_Method.first == "") {  // 未设置
-    String IP = "0.0.0.0";
-    return IP;
+    return String("0.0.0.0");
   } else if (config.IP_Obtain_Method.first == "meow") {  // meow
     return meow(config.IP_Obtain_Method.second);
   } else {  // unnecessary 或 manual

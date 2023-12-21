@@ -7,7 +7,7 @@
 
 [![Compile Sketch](https://github.com/Cookie-Cats/Cookie-Cats/actions/workflows/compile.yml/badge.svg?branch=main)](https://github.com/Cookie-Cats/Cookie-Cats/actions/workflows/compile.yml)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/666824e7cbd14652a1c8d9db92b11f3b)](https://app.codacy.com/gh/Cookie-Cats/Cookie-Cats/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
-[![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://github.com/cookie-cats/cookie-cats?tab=GPL-3.0-1-ov-file#readme)
 [![Join the chat](https://badges.gitter.im/repo.svg)](https://matrix.to/#/#cookie-cats:gitter.im)
 
 ## 功能设计
@@ -306,7 +306,7 @@
 
 请务必在您的赞赏中留言您的 GitHub 用户名，方便我们将您加入[贡献者](#贡献者)名单。您也会在[捐献者名单](https://github.com/Cookie-Cats#%E6%8D%90%E7%8C%AE%E8%80%85)中看到您捐助的具体金额和留给我们的暖心留言。
 
-您可以选择以下方式对我们捐助：
+您可以点击以下按钮对我们捐助：
 
 [![wechat](https://img.shields.io/badge/%E5%BE%AE%E4%BF%A1-CookieCats-green?logo=wechat)](https://oss.diazepam.cc/imgs/wechat_sponsor.jpg)  [![alipay](https://img.shields.io/badge/%E6%94%AF%E4%BB%98%E5%AE%9D-CookieCats-blue?logo=alipay)](https://oss.diazepam.cc/imgs/alipay_sponsor.jpg)
 
