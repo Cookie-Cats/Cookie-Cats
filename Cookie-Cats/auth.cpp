@@ -81,11 +81,9 @@ String ICACHE_FLASH_ATTR getDrcomIp(String apiURL) {
   if (response.status_code == HTTP_CODE_OK) {  // 返回 200，连接成功
     Serial.println(F("Connected to Drcom status API."));
     // 寻找本机 IP
-    int start = response.content.indexOf("{");  // 第一个 {
-    response.content.remove(0, start);          // 删掉第一个 { 前的内容
-    int end = response.content.indexOf("}");    // 最后一个 }
-    response.content.remove(end + 1);           // 删掉第一个 } 后的内容
-    DynamicJsonDocument responseJson(1024);     // 创建 Json 对象并解码
+    response.content.remove(0, response.content.indexOf("{"));   // 删掉第一个 { 前的内容
+    response.content.remove(response.content.indexOf("}") + 1);  // 删掉最后一个 } 后的内容
+    DynamicJsonDocument responseJson(1024);                      // 创建 Json 对象并解码
     DeserializationError error = deserializeJson(responseJson, response.content);
     IP = responseJson["ss5"].as<String>();
     if (error || (IP == "")) {  // 如果解析出错
