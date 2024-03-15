@@ -83,7 +83,7 @@ String ICACHE_FLASH_ATTR getDrcomIp(String apiURL) {
     // 寻找本机 IP
     response.content.remove(0, response.content.indexOf("{"));   // 删掉第一个 { 前的内容
     response.content.remove(response.content.indexOf("}") + 1);  // 删掉最后一个 } 后的内容
-    DynamicJsonDocument responseJson(1024);                      // 创建 Json 对象并解码
+    JsonDocument responseJson;                      // 创建 Json 对象并解码
     DeserializationError error = deserializeJson(responseJson, response.content);
     IP = responseJson["ss5"].as<String>();
     if (error || (IP == "")) {  // 如果解析出错

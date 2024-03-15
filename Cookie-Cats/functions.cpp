@@ -128,7 +128,7 @@ String ICACHE_FLASH_ATTR httpGetContentType(String filename) {
 // 读取配置文件
 void ICACHE_FLASH_ATTR readConfigurationFromFile(File& file, Configuration& configuration, PracticalCrypto& secret) {
   Serial.println(F("Found config.json, reading..."));
-  DynamicJsonDocument config(1024);                            // 分配一个 JSON 文档对象
+  JsonDocument config;                            // 分配一个 JSON 文档对象
   DeserializationError error = deserializeJson(config, file);  // 解析文件内容为 JSON 对象
   if (error) {
     Serial.println(F("Parsing config.json fails, using the default configuration."));

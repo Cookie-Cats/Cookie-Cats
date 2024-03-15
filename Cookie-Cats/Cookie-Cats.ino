@@ -201,7 +201,7 @@ void setup() {
   // 测试命令：curl -X POST -H "Content-Type: application/json" -d '{"Cookie_Cat_SSID":"CookieCat","Cookie_Cat_PASSWORD":"cookiecat","WiFi_SSID":"","WiFi_PASSWORD":"","username":"","password":"","carrier":"","school":"","IP_Obtain_Method":{"meow":"http://192.168.10.151:8080"},"allowOTA":"true"}' http://192.168.4.1/config/save
   httpserver.on("/config/save", HTTP_POST, [] {
     Serial.println(F("Receiving config.json..."));
-    DynamicJsonDocument doc(1024);                                               // 创建一个 JSON 文档对象，用于存储接收到的 JSON 数据
+    JsonDocument doc;                                               // 创建一个 JSON 文档对象，用于存储接收到的 JSON 数据
     DeserializationError error = deserializeJson(doc, httpserver.arg("plain"));  // 尝试从客户端读取 JSON 数据，并解析到文档对象中
 
     if (doc.containsKey("password") && doc["password"] != "") {  // 如果用户填写了密码项，则进行加密
